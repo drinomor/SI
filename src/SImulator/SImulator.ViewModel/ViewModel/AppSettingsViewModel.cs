@@ -1,4 +1,5 @@
 ﻿using SImulator.ViewModel.Model;
+using SImulator.ViewModel.Properties;
 using SImulator.ViewModel.PlatformSpecific;
 using SIUI.ViewModel;
 using SIUI.ViewModel.Core;
@@ -18,6 +19,11 @@ public sealed class AppSettingsViewModel
 
     public GameModes[] Modes { get; } = new GameModes[] { GameModes.Tv, GameModes.Sport };
 
+    /// <summary>
+    /// SIGame engine time settings (the same set and limits as in SIGame).
+    /// </summary>
+    public IReadOnlyList<EngineTimeSettingViewModel> EngineTimes { get; }
+
     [XmlIgnore]
     public ICommand Reset { get; private set; }
 
@@ -26,9 +32,28 @@ public sealed class AppSettingsViewModel
         Model = settings;
         SIUISettings = new SettingsViewModel(settings.SIUISettings);
         Sounds = new SoundSettingsViewModel(settings.Sounds);
+        EngineTimes = CreateEngineTimes();
 
         Reset = new SimpleCommand(Reset_Executed);
     }
+
+    // Lambdas read Model.EngineTimeSettings every time because the object is replaced on reset
+    private EngineTimeSettingViewModel[] CreateEngineTimes() =>
+    [
+        new(Resources.TimeSettings_ChoosingQuestion, 1, 120, () => Model.EngineTimeSettings.QuestionSelection, v => Model.EngineTimeSettings.QuestionSelection = v),
+        new(Resources.TimeSettings_ThinkingOnQuestion, 1, 120, () => Model.EngineTimeSettings.ButtonPressing, v => Model.EngineTimeSettings.ButtonPressing = v),
+        new(Resources.TimeSettings_PrintingAnswer, 1, 120, () => Model.EngineTimeSettings.Answering, v => Model.EngineTimeSettings.Answering = v),
+        new(Resources.TimeSettings_GivingCat, 1, 120, () => Model.EngineTimeSettings.PlayerSelection, v => Model.EngineTimeSettings.PlayerSelection = v),
+        new(Resources.TimeSettings_MakingStake, 1, 120, () => Model.EngineTimeSettings.StakeMaking, v => Model.EngineTimeSettings.StakeMaking = v),
+        new(Resources.TimeSettings_ThinkingOnSpecial, 1, 120, () => Model.EngineTimeSettings.SoloAnswering, v => Model.EngineTimeSettings.SoloAnswering = v),
+        new(Resources.TimeSettings_RightAnswer, 1, 10, () => Model.EngineTimeSettings.Reflection, v => Model.EngineTimeSettings.Reflection = v),
+        new(Resources.TimeSettings_Round, 1, 10800, () => Model.EngineTimeSettings.Round, v => Model.EngineTimeSettings.Round = v),
+        new(Resources.TimeSettings_ChoosingFinalTheme, 1, 120, () => Model.EngineTimeSettings.ThemeSelection, v => Model.EngineTimeSettings.ThemeSelection = v),
+        new(Resources.TimeSettings_FinalThinking, 1, 120, () => Model.EngineTimeSettings.HiddenAnswering, v => Model.EngineTimeSettings.HiddenAnswering = v),
+        new(Resources.TimeSettings_ShowmanDecisions, 1, 300, () => Model.EngineTimeSettings.ShowmanDecision, v => Model.EngineTimeSettings.ShowmanDecision = v),
+        new(Resources.TimeSettings_ImageTime, 1, 20, () => Model.EngineTimeSettings.Image, v => Model.EngineTimeSettings.Image = v),
+        new(Resources.TimeSettings_PartialImageTime, 1, 20, () => Model.EngineTimeSettings.PartialImage, v => Model.EngineTimeSettings.PartialImage = v),
+    ];
 
     internal void Reset_Executed(object? arg)
     {
@@ -85,6 +110,15 @@ public sealed class AppSettingsViewModel
             Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
             Model.UseSIGameEngine = defaultSettings.UseSIGameEngine;
             Model.AutoHosting = defaultSettings.AutoHosting;
+            Model.PartialImages = defaultSettings.PartialImages;
+            Model.PlayAllQuestionsInFinalRound = defaultSettings.PlayAllQuestionsInFinalRound;
+            Model.AllowEveryoneToPlayHiddenStakes = defaultSettings.AllowEveryoneToPlayHiddenStakes;
+            Model.EngineTimeSettings = defaultSettings.EngineTimeSettings;
+
+            foreach (var engineTime in EngineTimes)
+            {
+                engineTime.Refresh();
+            }
 
             Model.SaveLogs = defaultSettings.SaveLogs;
             Model.AutomaticGame = defaultSettings.AutomaticGame;

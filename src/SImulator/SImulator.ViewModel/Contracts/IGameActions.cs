@@ -42,5 +42,10 @@ public interface IGameActions : IDisposable
     /// </summary>
     void RenamePlayer(int playerIndex, PlayerInfo player) { }
 
+    /// <summary>
+    /// Handles media playback completion on the board.
+    /// </summary>
+    void OnMediaCompleted(string contentType, string contentValue) { }
+
     void SetPause(bool isPaused) { }
 }

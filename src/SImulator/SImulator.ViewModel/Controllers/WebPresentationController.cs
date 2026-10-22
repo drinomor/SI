@@ -37,6 +37,8 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
     public Action<int>? PlayerSelectionCallback { get; set; }
 
+    public Action<string, string>? MediaCompletedCallback { get; set; }
+
     public event Action<string>? SendJsonMessage;
 
     public event Action<Exception>? Error;
@@ -700,6 +702,10 @@ public sealed class WebPresentationController : IPresentationController, IWebInt
 
             case "selectPlayer":
                 PlayerSelectionCallback?.Invoke(data["playerIndex"].GetInt32());
+                break;
+
+            case "mediaCompleted":
+                MediaCompletedCallback?.Invoke(data["contentType"].GetString() ?? "", data["contentValue"].GetString() ?? "");
                 break;
 
             case "keyPressed":

@@ -503,6 +503,34 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
+    /// <summary>
+    /// Creates a copy of the engine time settings: the engine keeps the object and could change it during the game.
+    /// </summary>
+    private SI.Contracts.TimeSettings CreateEngineTimeSettings()
+    {
+        var source = Settings.EngineTimeSettings;
+
+        return new SI.Contracts.TimeSettings
+        {
+            QuestionSelection = source.QuestionSelection,
+            ThemeSelection = source.ThemeSelection,
+            PlayerSelection = source.PlayerSelection,
+            ButtonPressing = source.ButtonPressing,
+            ButtonsAccepting = source.ButtonsAccepting,
+            Answering = source.Answering,
+            SoloAnswering = source.SoloAnswering,
+            HiddenAnswering = source.HiddenAnswering,
+            StakeMaking = source.StakeMaking,
+            ShowmanDecision = source.ShowmanDecision,
+            Round = source.Round,
+            ButtonBlocking = (int)Math.Round(Settings.BlockingTime), // The engine supports whole seconds only
+            Reflection = source.Reflection,
+            Image = source.Image,
+            PartialImage = source.PartialImage,
+            Appellation = source.Appellation,
+        };
+    }
+
     private async Task<GameViewModel> CreateGameNewAsync(IPresentationController presentationController, IExtendedListener presentationListener)
     {
         SIDocument document;
@@ -553,10 +581,17 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             Managed = !Settings.AutoHosting,
             Oral = true,
+            // SImulator selects the first presser itself and sends only that press to the engine
             ButtonPressMode = SI.Contracts.ButtonPressMode.FirstWins,
             FalseStart = Settings.FalseStart,
             PartialText = Settings.PartialText,
+            PartialImages = Settings.PartialImages,
             ReadingSpeed = Settings.QuestionReadingSpeed,
+            PlayAllThemesInThemesRemovalRound = Settings.PlayAllQuestionsInFinalRound,
+            AllowEveryoneToPlayHiddenStakes = Settings.AllowEveryoneToPlayHiddenStakes,
+            QuestionWithButtonPenalty = Settings.SubstractOnWrong ? SI.Contracts.PenaltyType.SubtractPoints : SI.Contracts.PenaltyType.None,
+            // Same mapping as in SIGame
+            GameMode = Settings.GameMode == Model.GameModes.Sport ? SI.Contracts.GameMode.Sequential : SI.Contracts.GameMode.Classic,
         };
 
         var roomSettings = new SI.Contracts.RoomSettings
@@ -586,7 +621,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
            node,
            gameSettings,
            roomSettings,
-           new SI.Contracts.TimeSettings(),
+           CreateEngineTimeSettings(),
            rules,
            Settings.Language ?? "en-US",
            document,
@@ -635,6 +670,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             game.Authenticate,
             game.OnMessageReceivedAsync,
             (playerIndex, name) => game.RenamePlayerAsync(playerIndex, name));
+
+        presentationController.MediaCompletedCallback = gameActions.OnMediaCompleted;
 
         IGameLogger gameLogger;
 

@@ -39,6 +39,8 @@ internal sealed class TestWebPresentationController : IPresentationController
 
     public Action<int>? PlayerSelectionCallback { get; set; }
 
+    public Action<string, string>? MediaCompletedCallback { get; set; }
+
     private void AddCommand(string command)
     {
         lock (_lock)

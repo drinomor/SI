@@ -19,6 +19,11 @@ public interface IPresentationController : IDisposable
 
     Action<int>? PlayerSelectionCallback { get; set; }
 
+    /// <summary>
+    /// Called when the board has finished playing media content (content type, content value).
+    /// </summary>
+    Action<string, string>? MediaCompletedCallback { get; set; }
+
     event Action<Exception>? Error;
 
     bool CanControlMedia { get; }

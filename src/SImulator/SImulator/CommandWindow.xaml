@@ -119,6 +119,35 @@
                 <Setter Property="Margin" Value="0,7,0,2" />
             </Style>
 
+            <!-- Settings that are not used by the SIGame engine (it has its own Time tab). DataContext: MainViewModel -->
+            <Style x:Key="OldEngineOnly" TargetType="FrameworkElement">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Settings.UseSIGameEngine}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- The same for elements whose DataContext is AppSettings -->
+            <Style x:Key="OldEngineOnlyModel" TargetType="FrameworkElement">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding UseSIGameEngine}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <!-- SIGame engine rules. DataContext: AppSettings -->
+            <Style x:Key="SIGameEngineOnlyModel" TargetType="FrameworkElement">
+                <Setter Property="Visibility" Value="Collapsed" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding UseSIGameEngine}" Value="True">
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <Style TargetType="ComboBox">
                 <Setter Property="Width" Value="250" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
@@ -1532,7 +1561,7 @@
                 </ComboBox>
                 
                 <UniformGrid Columns="2" Margin="0,0,4,0">
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom" Style="{StaticResource OldEngineOnly}">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.RoundTime}" />
                         
                         <TextBox
@@ -1543,7 +1572,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom" Style="{StaticResource OldEngineOnly}">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.QuestionTime}" />
 
                         <TextBox
@@ -1554,7 +1583,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom" Style="{StaticResource OldEngineOnly}">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ThinkingTime}" TextWrapping="Wrap" />
 
                         <TextBox
@@ -1565,7 +1594,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom" Style="{StaticResource OldEngineOnly}">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.SpecialThinkingTime}" TextWrapping="Wrap" />
 
                         <TextBox
@@ -1576,7 +1605,7 @@
                             IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}" />
                     </StackPanel>
 
-                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom">
+                    <StackPanel Margin="0,0,5,0" VerticalAlignment="Bottom" Style="{StaticResource OldEngineOnly}">
                         <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.FinalThinkingTime}" />
 
                         <TextBox
@@ -1602,9 +1631,11 @@
                 </UniformGrid>
                 
                 <UniformGrid Columns="2" Margin="0,4,4,0" DataContext="{Binding SettingsViewModel.Model}">
-                    <CheckBox Margin="0,0,5,0" IsChecked="{Binding EndQuestionOnRightAnswer}" Content="{x:Static lp:Resources.EndQuestionOnRightAnswer}" />
+                    <Border Style="{StaticResource OldEngineOnlyModel}">
+                        <CheckBox Margin="0,0,5,0" IsChecked="{Binding EndQuestionOnRightAnswer}" Content="{x:Static lp:Resources.EndQuestionOnRightAnswer}" />
+                    </Border>
 
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource OldEngineOnlyModel}">
                         <CheckBox Margin="5,0,0,0" IsChecked="{Binding DropStatsOnBack}" Content="{x:Static lp:Resources.DropStatsOnBack}" />
                         
                         <Button Style="{StaticResource HelpButton}">
@@ -1624,7 +1655,7 @@
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding FalseStart}">
+                    <StackPanel Orientation="Horizontal" IsEnabled="{Binding FalseStart}" Style="{StaticResource OldEngineOnlyModel}">
                         <CheckBox IsChecked="{Binding FalseStartMultimedia}" Margin="5,5,5,0" Content="{x:Static lp:Resources.FalseStartMultimedia}" />
 
                         <Button Style="{StaticResource HelpButton}">
@@ -1635,33 +1666,88 @@
                     </StackPanel>
 
                     <CheckBox Margin="0,5,0,0" IsChecked="{Binding SubstractOnWrong}" Content="{x:Static lp:Resources.SubstractOnWrong}" />
-                    <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
-                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
+                    <Border Style="{StaticResource OldEngineOnlyModel}">
+                        <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlaySpecials}" Content="{x:Static lp:Resources.PlaySpecials}" />
+                    </Border>
+
+                    <Border Style="{StaticResource OldEngineOnlyModel}">
+                        <CheckBox Margin="0,5,0,0" IsChecked="{Binding ShowLostButtonPlayers}" Content="{x:Static lp:Resources.ShowLostButtonPlayers}" />
+                    </Border>
                     <CheckBox Margin="5,5,0,0" IsChecked="{Binding UseSIGameEngine}" Content="{x:Static lp:Resources.UseSIGameEngine}" />
-                    <CheckBox Margin="0,5,0,0" IsChecked="{Binding PartialText}" Content="{x:Static lp:Resources.PartialText}">
-                        <CheckBox.Style>
-                            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding UseSIGameEngine}" Value="False">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
+                    <!-- Help buttons stay enabled: a disabled check box does not show its tooltip -->
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Margin="0,5,0,0" IsChecked="{Binding PartialText}" Content="{x:Static lp:Resources.PartialText}">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding UseSIGameEngine}" Value="False">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
 
-                                    <DataTrigger Binding="{Binding FalseStart}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </CheckBox.Style>
-                    </CheckBox>
+                                        <DataTrigger Binding="{Binding FalseStart}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
 
-                    <CheckBox
-                        Margin="5,5,0,0"
-                        IsChecked="{Binding AutoHosting}"
-                        IsEnabled="{Binding UseSIGameEngine}"
-                        Content="{x:Static lp:Resources.AutoHosting}"
-                        ToolTip="{x:Static lp:Resources.AutoHostingHint}" />
+                        <Button Style="{StaticResource HelpButton}">
+                            <lb:TipBehavior.Tip>
+                                <TextBlock TextWrapping="Wrap" MaxWidth="400" Text="{x:Static lp:Resources.PartialTextHint}" />
+                            </lb:TipBehavior.Tip>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox
+                            Margin="5,5,0,0"
+                            IsChecked="{Binding AutoHosting}"
+                            IsEnabled="{Binding UseSIGameEngine}"
+                            Content="{x:Static lp:Resources.AutoHosting}" />
+
+                        <Button Style="{StaticResource HelpButton}">
+                            <lb:TipBehavior.Tip>
+                                <TextBlock TextWrapping="Wrap" MaxWidth="400" Text="{x:Static lp:Resources.AutoHostingHint}" />
+                            </lb:TipBehavior.Tip>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource SIGameEngineOnlyModel}">
+                        <CheckBox Margin="0,5,0,0" IsChecked="{Binding PartialImages}" Content="{x:Static lp:Resources.PartialImages}">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding FalseStart}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+
+                        <Button Style="{StaticResource HelpButton}">
+                            <lb:TipBehavior.Tip>
+                                <TextBlock TextWrapping="Wrap" MaxWidth="400" Text="{x:Static lp:Resources.PartialImagesHint}" />
+                            </lb:TipBehavior.Tip>
+                        </Button>
+                    </StackPanel>
+
+                    <Border Style="{StaticResource SIGameEngineOnlyModel}">
+                        <CheckBox Margin="5,5,0,0" IsChecked="{Binding PlayAllQuestionsInFinalRound}" Content="{x:Static lp:Resources.PlayAllQuestionsInFinalRound}" />
+                    </Border>
+
+                    <Border Style="{StaticResource SIGameEngineOnlyModel}">
+                        <CheckBox
+                            Margin="0,5,0,0"
+                            IsChecked="{Binding AllowEveryoneToPlayHiddenStakes}"
+                            Content="{x:Static lp:Resources.AllowEveryoneToPlayHiddenStakes}"
+                            ToolTip="{x:Static lp:Resources.AllowEveryoneToPlayHiddenStakesHint}" />
+                    </Border>
                 </UniformGrid>
 
+                <!-- Specials aliases are used by the old engine only -->
+                <Border Style="{StaticResource OldEngineOnly}">
                 <Expander
                     Style="{StaticResource Customizable}"
                     Header="{x:Static lp:Resources.SpecialQuestionsAliases}"
@@ -1694,6 +1780,7 @@
                         </UniformGrid>
                     </Grid>
                 </Expander>
+                </Border>
 
                 <CheckBox
                     IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}"
@@ -1729,6 +1816,63 @@
                     Margin="0,15,4,5"
                     HorizontalAlignment="Left" />
             </StackPanel>
+        </TabItem>
+
+        <TabItem Header="{x:Static lp:Resources.EngineTime}">
+            <TabItem.Style>
+                <Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Settings.UseSIGameEngine}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TabItem.Style>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="2,2,0,0">
+                    <TextBlock Style="{StaticResource Title}" Text="{x:Static lp:Resources.EngineTime}" />
+                    <TextBlock Text="{x:Static lp:Resources.EngineTimeHint}" TextWrapping="Wrap" Margin="0,4,4,0" />
+
+                    <ItemsControl
+                        Margin="0,0,4,0"
+                        ItemsSource="{Binding SettingsViewModel.EngineTimes}"
+                        IsEnabled="{Binding Mode, Converter={StaticResource IsStart}, Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Style="{StaticResource Header}" Text="{Binding Name}" TextWrapping="Wrap" />
+
+                                    <DockPanel>
+                                        <TextBlock
+                                            DockPanel.Dock="Right"
+                                            Text="{x:Static lp:Resources.Sec}"
+                                            VerticalAlignment="Center"
+                                            Margin="4,0,0,0" />
+
+                                        <TextBox
+                                            DockPanel.Dock="Right"
+                                            Width="50"
+                                            lb:NumericBehavior.IsAttached="True"
+                                            Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                            VerticalContentAlignment="Center" />
+
+                                        <Slider
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            Minimum="{Binding Minimum}"
+                                            Maximum="{Binding Maximum}"
+                                            Value="{Binding Value}"
+                                            TickFrequency="1"
+                                            IsSnapToTickEnabled="True"
+                                            IsMoveToPointEnabled="True" />
+                                    </DockPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
 
         <TabItem Header="{x:Static lp:Resources.Buttons}">

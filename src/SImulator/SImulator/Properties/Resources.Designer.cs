@@ -133,6 +133,24 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Everybody could play Stakes For All (final) question.
+        /// </summary>
+        public static string AllowEveryoneToPlayHiddenStakes {
+            get {
+                return ResourceManager.GetString("AllowEveryoneToPlayHiddenStakes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Even having 0 or negative score.
+        /// </summary>
+        public static string AllowEveryoneToPlayHiddenStakesHint {
+            get {
+                return ResourceManager.GetString("AllowEveryoneToPlayHiddenStakesHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Answer.
         /// </summary>
         public static string Answer {
@@ -250,7 +268,7 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers.
+        ///   Looks up a localized string similar to The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers. Available only with the SIGame engine.
         /// </summary>
         public static string AutoHostingHint {
             get {
@@ -579,6 +597,24 @@ namespace SImulator.Properties {
         public static string EndQuestionOnRightAnswer {
             get {
                 return ResourceManager.GetString("EndQuestionOnRightAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time.
+        /// </summary>
+        public static string EngineTime {
+            get {
+                return ResourceManager.GetString("EngineTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Used by the SIGame engine. The button blocking time is set on the Buttons tab.
+        /// </summary>
+        public static string EngineTimeHint {
+            get {
+                return ResourceManager.GetString("EngineTimeHint", resourceCulture);
             }
         }
         
@@ -1033,11 +1069,38 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Partial images.
+        /// </summary>
+        public static string PartialImages {
+            get {
+                return ResourceManager.GetString("PartialImages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Images appear in portions. Available only without false starts.
+        /// </summary>
+        public static string PartialImagesHint {
+            get {
+                return ResourceManager.GetString("PartialImagesHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Partial question text.
         /// </summary>
         public static string PartialText {
             get {
                 return ResourceManager.GetString("PartialText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The question text appears on the board gradually at the reading speed instead of being highlighted. Available only with the SIGame engine and without false starts: buttons are enabled at once and a press interrupts the text.
+        /// </summary>
+        public static string PartialTextHint {
+            get {
+                return ResourceManager.GetString("PartialTextHint", resourceCulture);
             }
         }
         
@@ -1083,6 +1146,15 @@ namespace SImulator.Properties {
         public static string PlacementOral {
             get {
                 return ResourceManager.GetString("PlacementOral", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Play all questions in final round.
+        /// </summary>
+        public static string PlayAllQuestionsInFinalRound {
+            get {
+                return ResourceManager.GetString("PlayAllQuestionsInFinalRound", resourceCulture);
             }
         }
         
@@ -1398,6 +1470,15 @@ namespace SImulator.Properties {
         public static string Screen {
             get {
                 return ResourceManager.GetString("Screen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sec.
+        /// </summary>
+        public static string Sec {
+            get {
+                return ResourceManager.GetString("Sec", resourceCulture);
             }
         }
         

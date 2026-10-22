@@ -748,6 +748,33 @@ To play, you need to organize a local network.</value>
     <value>Automatic hosting</value>
   </data>
   <data name="AutoHostingHint" xml:space="preserve">
-    <value>The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers</value>
+    <value>The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers. Available only with the SIGame engine</value>
+  </data>
+  <data name="EngineTime" xml:space="preserve">
+    <value>Time</value>
+  </data>
+  <data name="Sec" xml:space="preserve">
+    <value>sec</value>
+  </data>
+  <data name="EngineTimeHint" xml:space="preserve">
+    <value>Used by the SIGame engine. The button blocking time is set on the Buttons tab</value>
+  </data>
+  <data name="PartialImages" xml:space="preserve">
+    <value>Partial images</value>
+  </data>
+  <data name="PartialImagesHint" xml:space="preserve">
+    <value>Images appear in portions. Available only without false starts</value>
+  </data>
+  <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
+    <value>Play all questions in final round</value>
+  </data>
+  <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
+    <value>Everybody could play Stakes For All (final) question</value>
+  </data>
+  <data name="AllowEveryoneToPlayHiddenStakesHint" xml:space="preserve">
+    <value>Even having 0 or negative score</value>
+  </data>
+  <data name="PartialTextHint" xml:space="preserve">
+    <value>The question text appears on the board gradually at the reading speed instead of being highlighted. Available only with the SIGame engine and without false starts: buttons are enabled at once and a press interrupts the text</value>
   </data>
 </root>

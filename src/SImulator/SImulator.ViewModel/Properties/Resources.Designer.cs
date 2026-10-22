@@ -574,6 +574,123 @@ namespace SImulator.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Сhoosing a final round theme.
+        /// </summary>
+        public static string TimeSettings_ChoosingFinalTheme {
+            get {
+                return ResourceManager.GetString("TimeSettings_ChoosingFinalTheme", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choosing a question.
+        /// </summary>
+        public static string TimeSettings_ChoosingQuestion {
+            get {
+                return ResourceManager.GetString("TimeSettings_ChoosingQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thinking on final question.
+        /// </summary>
+        public static string TimeSettings_FinalThinking {
+            get {
+                return ResourceManager.GetString("TimeSettings_FinalThinking", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Giving the &quot;Secret question&quot;.
+        /// </summary>
+        public static string TimeSettings_GivingCat {
+            get {
+                return ResourceManager.GetString("TimeSettings_GivingCat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image display.
+        /// </summary>
+        public static string TimeSettings_ImageTime {
+            get {
+                return ResourceManager.GetString("TimeSettings_ImageTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Making a bet in an &quot;Stake question&quot; and in a final question.
+        /// </summary>
+        public static string TimeSettings_MakingStake {
+            get {
+                return ResourceManager.GetString("TimeSettings_MakingStake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partial image display.
+        /// </summary>
+        public static string TimeSettings_PartialImageTime {
+            get {
+                return ResourceManager.GetString("TimeSettings_PartialImageTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entering the answer after pressing the button.
+        /// </summary>
+        public static string TimeSettings_PrintingAnswer {
+            get {
+                return ResourceManager.GetString("TimeSettings_PrintingAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Showing right answer.
+        /// </summary>
+        public static string TimeSettings_RightAnswer {
+            get {
+                return ResourceManager.GetString("TimeSettings_RightAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Round.
+        /// </summary>
+        public static string TimeSettings_Round {
+            get {
+                return ResourceManager.GetString("TimeSettings_Round", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Making decisions and accepting answers by showman.
+        /// </summary>
+        public static string TimeSettings_ShowmanDecisions {
+            get {
+                return ResourceManager.GetString("TimeSettings_ShowmanDecisions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thinking on a question.
+        /// </summary>
+        public static string TimeSettings_ThinkingOnQuestion {
+            get {
+                return ResourceManager.GetString("TimeSettings_ThinkingOnQuestion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thinking on a special question.
+        /// </summary>
+        public static string TimeSettings_ThinkingOnSpecial {
+            get {
+                return ResourceManager.GetString("TimeSettings_ThinkingOnSpecial", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wrong answer.
         /// </summary>
         public static string WrongAnswer {

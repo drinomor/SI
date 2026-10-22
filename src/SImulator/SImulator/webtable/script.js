@@ -28,7 +28,14 @@ try {
                 resolve(true);
             });
         },
-        mediaLoaded: function () { }
+        mediaLoaded: function () { },
+        onMediaCompleted: function (contentType, contentValue) {
+            window.chrome.webview.postMessage({ type: 'mediaCompleted', contentType: contentType, contentValue: contentValue });
+
+            return new Promise(function (resolve) {
+                resolve(true);
+            });
+        }
     });
 
     window.chrome.webview.postMessage({ type: 'loaded' });

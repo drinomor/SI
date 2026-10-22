@@ -749,6 +749,33 @@ Escape (правая кнопка мыши) - завершить игру</value
     <value>Автоматическое ведение</value>
   </data>
   <data name="AutoHostingHint" xml:space="preserve">
-    <value>Движок сам зачитывает вопрос, открывает кнопки и идёт дальше, как в SIGame. Ведущий только оценивает ответы</value>
+    <value>Движок сам зачитывает вопрос, открывает кнопки и идёт дальше, как в SIGame. Ведущий только оценивает ответы. Доступно только с движком SIGame</value>
+  </data>
+  <data name="EngineTime" xml:space="preserve">
+    <value>Время</value>
+  </data>
+  <data name="Sec" xml:space="preserve">
+    <value>с</value>
+  </data>
+  <data name="EngineTimeHint" xml:space="preserve">
+    <value>Используются движком SIGame. Время блокировки кнопки задаётся на вкладке «Кнопки»</value>
+  </data>
+  <data name="PartialImages" xml:space="preserve">
+    <value>Частичный вывод изображений</value>
+  </data>
+  <data name="PartialImagesHint" xml:space="preserve">
+    <value>Изображения выводятся порционно. Доступно только без фальстартов</value>
+  </data>
+  <data name="PlayAllQuestionsInFinalRound" xml:space="preserve">
+    <value>Играть все вопросы в финальном раунде</value>
+  </data>
+  <data name="AllowEveryoneToPlayHiddenStakes" xml:space="preserve">
+    <value>Все могут играть Вопрос со ставками для всех (финал)</value>
+  </data>
+  <data name="AllowEveryoneToPlayHiddenStakesHint" xml:space="preserve">
+    <value>Даже с 0 или отрицательным счётом</value>
+  </data>
+  <data name="PartialTextHint" xml:space="preserve">
+    <value>Текст вопроса появляется на табло постепенно, со скоростью чтения, вместо подсветки. Доступно только с движком SIGame и без фальстартов: кнопки открыты сразу, нажатие прерывает вывод текста</value>
   </data>
 </root>

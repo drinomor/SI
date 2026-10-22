@@ -291,4 +291,43 @@
   <data name="DefaultPlayerName" xml:space="preserve">
     <value>Игрок {0}</value>
   </data>
+  <data name="TimeSettings_ChoosingQuestion" xml:space="preserve">
+    <value>Выбор вопроса</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnQuestion" xml:space="preserve">
+    <value>Размышление над вопросом</value>
+  </data>
+  <data name="TimeSettings_PrintingAnswer" xml:space="preserve">
+    <value>Ввод ответа после нажатия кнопки</value>
+  </data>
+  <data name="TimeSettings_GivingCat" xml:space="preserve">
+    <value>Размышление на отдачу "Вопроса с секретом"</value>
+  </data>
+  <data name="TimeSettings_MakingStake" xml:space="preserve">
+    <value>Размышление над ставкой в "Вопросе со ставкой" и в финале</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnSpecial" xml:space="preserve">
+    <value>Размышление над спецвопросом</value>
+  </data>
+  <data name="TimeSettings_RightAnswer" xml:space="preserve">
+    <value>Вывод правильного ответа</value>
+  </data>
+  <data name="TimeSettings_Round" xml:space="preserve">
+    <value>Раунд</value>
+  </data>
+  <data name="TimeSettings_ChoosingFinalTheme" xml:space="preserve">
+    <value>Выбор темы в финальном раунде</value>
+  </data>
+  <data name="TimeSettings_FinalThinking" xml:space="preserve">
+    <value>Обдумывание в финале</value>
+  </data>
+  <data name="TimeSettings_ShowmanDecisions" xml:space="preserve">
+    <value>Принятие ответов и решений ведущим</value>
+  </data>
+  <data name="TimeSettings_ImageTime" xml:space="preserve">
+    <value>Вывод изображения</value>
+  </data>
+  <data name="TimeSettings_PartialImageTime" xml:space="preserve">
+    <value>Вывод частичных изображений</value>
+  </data>
 </root>

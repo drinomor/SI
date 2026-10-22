@@ -129,6 +129,30 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
         }
     }
 
+    public async void OnMediaCompleted(string contentType, string contentValue)
+    {
+        try
+        {
+            // The engine waits for completions from at least half of the connected humans (host and players).
+            // Players have no own boards, so SImulator reports the completion for everybody.
+            // Repeated or unknown senders are ignored by the engine
+            var text = string.Join(Message.ArgsSeparator, Messages.MediaCompleted, contentType, contentValue);
+
+            // Snapshot: the list may be replaced by the engine thread while we are awaiting
+            var senders = _state.Players.Select(player => player.Name).Prepend(_state.ShowMan.Name).ToArray();
+
+            foreach (var sender in senders)
+            {
+                await _onMessageReceivedAsync(new Message(text, sender));
+            }
+        }
+        catch (Exception exc)
+        {
+            // async void: an unhandled exception here would crash the application
+            Trace.TraceError($"Media completion error: {exc}");
+        }
+    }
+
     public void SetPause(bool isPaused) => _actions.Pause(isPaused);
 
     public void Dispose()

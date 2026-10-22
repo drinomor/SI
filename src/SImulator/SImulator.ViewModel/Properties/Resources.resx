@@ -291,4 +291,43 @@
   <data name="DefaultPlayerName" xml:space="preserve">
     <value>Player {0}</value>
   </data>
+  <data name="TimeSettings_ChoosingQuestion" xml:space="preserve">
+    <value>Choosing a question</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnQuestion" xml:space="preserve">
+    <value>Thinking on a question</value>
+  </data>
+  <data name="TimeSettings_PrintingAnswer" xml:space="preserve">
+    <value>Entering the answer after pressing the button</value>
+  </data>
+  <data name="TimeSettings_GivingCat" xml:space="preserve">
+    <value>Giving the "Secret question"</value>
+  </data>
+  <data name="TimeSettings_MakingStake" xml:space="preserve">
+    <value>Making a bet in an "Stake question" and in a final question</value>
+  </data>
+  <data name="TimeSettings_ThinkingOnSpecial" xml:space="preserve">
+    <value>Thinking on a special question</value>
+  </data>
+  <data name="TimeSettings_RightAnswer" xml:space="preserve">
+    <value>Showing right answer</value>
+  </data>
+  <data name="TimeSettings_Round" xml:space="preserve">
+    <value>Round</value>
+  </data>
+  <data name="TimeSettings_ChoosingFinalTheme" xml:space="preserve">
+    <value>Сhoosing a final round theme</value>
+  </data>
+  <data name="TimeSettings_FinalThinking" xml:space="preserve">
+    <value>Thinking on final question</value>
+  </data>
+  <data name="TimeSettings_ShowmanDecisions" xml:space="preserve">
+    <value>Making decisions and accepting answers by showman</value>
+  </data>
+  <data name="TimeSettings_ImageTime" xml:space="preserve">
+    <value>Image display</value>
+  </data>
+  <data name="TimeSettings_PartialImageTime" xml:space="preserve">
+    <value>Partial image display</value>
+  </data>
 </root>

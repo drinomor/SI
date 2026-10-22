@@ -793,6 +793,68 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _partialImages = SI.Contracts.RulesSettings.DefaultPartialImages;
+
+    /// <summary>
+    /// Images are displayed in portions (SIGame engine, when false starts are disabled).
+    /// </summary>
+    [DefaultValue(SI.Contracts.RulesSettings.DefaultPartialImages)]
+    public bool PartialImages
+    {
+        get => _partialImages;
+        set
+        {
+            if (_partialImages != value)
+            {
+                _partialImages = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _playAllQuestionsInFinalRound = SI.Contracts.RulesSettings.DefaultPlayAllThemesInThemesRemovalRound;
+
+    /// <summary>
+    /// Play all questions in the final round instead of removing themes (SIGame engine).
+    /// </summary>
+    [DefaultValue(SI.Contracts.RulesSettings.DefaultPlayAllThemesInThemesRemovalRound)]
+    public bool PlayAllQuestionsInFinalRound
+    {
+        get => _playAllQuestionsInFinalRound;
+        set
+        {
+            if (_playAllQuestionsInFinalRound != value)
+            {
+                _playAllQuestionsInFinalRound = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool _allowEveryoneToPlayHiddenStakes = SI.Contracts.RulesSettings.DefaultAllowEveryoneToPlayHiddenStakes;
+
+    /// <summary>
+    /// Players with zero or negative score could play the stakes for all (final) question (SIGame engine).
+    /// </summary>
+    [DefaultValue(SI.Contracts.RulesSettings.DefaultAllowEveryoneToPlayHiddenStakes)]
+    public bool AllowEveryoneToPlayHiddenStakes
+    {
+        get => _allowEveryoneToPlayHiddenStakes;
+        set
+        {
+            if (_allowEveryoneToPlayHiddenStakes != value)
+            {
+                _allowEveryoneToPlayHiddenStakes = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// SIGame engine time settings. Button blocking time is taken from <see cref="BlockingTime" />.
+    /// </summary>
+    public SI.Contracts.TimeSettings EngineTimeSettings { get; set; } = new();
+
     #endregion
 
     public void Save(Stream stream, XmlSerializer? serializer = null)
