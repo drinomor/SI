@@ -84,6 +84,7 @@ public sealed class AppSettingsViewModel
             Model.PlaySpecials = defaultSettings.PlaySpecials;
             Model.FalseStartMultimedia = defaultSettings.FalseStartMultimedia;
             Model.UseSIGameEngine = defaultSettings.UseSIGameEngine;
+            Model.AutoHosting = defaultSettings.AutoHosting;
 
             Model.SaveLogs = defaultSettings.SaveLogs;
             Model.AutomaticGame = defaultSettings.AutomaticGame;

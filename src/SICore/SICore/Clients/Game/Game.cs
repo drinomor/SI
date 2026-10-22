@@ -606,6 +606,68 @@ public sealed class Game : MessageHandler
         CancellationToken cancellationToken = default) =>
         _state.TaskLock.WithLockAsync(() => AuthenticateCore(name, isMale, role, password), cancellationToken);
 
+    /// <summary>
+    /// Renames a player. Intended for hosts managing players that have no network clients
+    /// (e.g. SImulator players using physical buttons).
+    /// </summary>
+    /// <param name="playerIndex">Player index.</param>
+    /// <param name="name">New player name.</param>
+    /// <returns>True if the player has the new name; false if the name is invalid or occupied.</returns>
+    public ValueTask<bool> RenamePlayerAsync(int playerIndex, string name, CancellationToken cancellationToken = default) =>
+        _state.TaskLock.WithLockAsync(() => RenamePlayerCore(playerIndex, name), cancellationToken);
+
+    private bool RenamePlayerCore(int playerIndex, string name)
+    {
+        name = name.Trim();
+
+        if (playerIndex < 0 || playerIndex >= _state.Players.Count || name.Length == 0 || name == Constants.FreePlace)
+        {
+            return false;
+        }
+
+        var player = _state.Players[playerIndex];
+        var oldName = player.Name;
+
+        if (name == oldName)
+        {
+            return true;
+        }
+
+        if (_state.AllPersons.ContainsKey(name))
+        {
+            return false;
+        }
+
+        _state.BeginUpdatePersons($"Player {playerIndex} renamed from {oldName} to {name}");
+
+        try
+        {
+            player.Name = name;
+        }
+        finally
+        {
+            _state.EndUpdatePersons();
+        }
+
+        // Pending decisions refer to persons by name
+        for (var i = 0; i < _state.DecisionMakers.Count; i++)
+        {
+            if (_state.DecisionMakers[i] == oldName)
+            {
+                _state.DecisionMakers[i] = name;
+            }
+        }
+
+        if (_state.StakeLimits.Remove(oldName, out var stakeLimit))
+        {
+            _state.StakeLimits[name] = stakeLimit;
+        }
+
+        // Clients update the player at this index in place
+        _actions.InformConnected(name, GameRole.Player, playerIndex, player.IsMale);
+        return true;
+    }
+
     [Obsolete]
     private string GetAuthenticationErrorMessage(AuthenticationResult result) =>
         result switch

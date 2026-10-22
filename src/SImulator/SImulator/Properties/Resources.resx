@@ -732,4 +732,22 @@ To play, you need to organize a local network.</value>
   <data name="BrowserBoardDisconnected" xml:space="preserve">
     <value>Connection to SImulator is lost. Open the board again from SImulator.</value>
   </data>
+  <data name="AnsweringPlayer" xml:space="preserve">
+    <value>Answering</value>
+  </data>
+  <data name="AnswerIsRight" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="AnswerIsWrong" xml:space="preserve">
+    <value>Wrong</value>
+  </data>
+  <data name="PassAnswerHint" xml:space="preserve">
+    <value>No points are deducted; the player cannot press again on this question</value>
+  </data>
+  <data name="AutoHosting" xml:space="preserve">
+    <value>Automatic hosting</value>
+  </data>
+  <data name="AutoHostingHint" xml:space="preserve">
+    <value>The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers</value>
+  </data>
 </root>

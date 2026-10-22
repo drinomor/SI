@@ -733,4 +733,22 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="BrowserBoardDisconnected" xml:space="preserve">
     <value>Соединение с SImulator потеряно. Откройте табло заново из SImulator.</value>
   </data>
+  <data name="AnsweringPlayer" xml:space="preserve">
+    <value>Отвечает</value>
+  </data>
+  <data name="AnswerIsRight" xml:space="preserve">
+    <value>Верно</value>
+  </data>
+  <data name="AnswerIsWrong" xml:space="preserve">
+    <value>Неверно</value>
+  </data>
+  <data name="PassAnswerHint" xml:space="preserve">
+    <value>Очки не списываются, игрок больше не может нажимать в этом вопросе</value>
+  </data>
+  <data name="AutoHosting" xml:space="preserve">
+    <value>Автоматическое ведение</value>
+  </data>
+  <data name="AutoHostingHint" xml:space="preserve">
+    <value>Движок сам зачитывает вопрос, открывает кнопки и идёт дальше, как в SIGame. Ведущий только оценивает ответы</value>
+  </data>
 </root>

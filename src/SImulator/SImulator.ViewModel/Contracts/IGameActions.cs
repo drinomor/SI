@@ -29,11 +29,18 @@ public interface IGameActions : IDisposable
 
     void IsWrongAnswer();
 
+    void IsPassAnswer();
+
     void SelectPlayer(int playerIndex);
 
     void ConnectPlayer(PlayerInfo player) { }
 
-    void PlayerPressed(PlayerInfo player) { }
+    void PlayerPressed(int playerIndex, PlayerInfo player) { }
+
+    /// <summary>
+    /// Applies the player name edited by the host. May restore the previous name if the new one is rejected.
+    /// </summary>
+    void RenamePlayer(int playerIndex, PlayerInfo player) { }
 
     void SetPause(bool isPaused) { }
 }

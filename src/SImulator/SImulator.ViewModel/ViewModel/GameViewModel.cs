@@ -41,6 +41,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private IButtonManager? _buttonManager;
 
     /// <summary>
+    /// Is the button manager currently listening. Accessed only on the UI thread.
+    /// </summary>
+    private bool _buttonsStarted;
+
+    /// <summary>
     /// Game log writer.
     /// </summary>
     private readonly IGameLogger _gameLogger;
@@ -152,6 +157,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     public ICommand AddStake { get; }
 
     public ICommand SubtractStake { get; }
+
+    /// <summary>
+    /// Rejects the answer without penalty (e.g. an accidental press). The player cannot press again on this question.
+    /// </summary>
+    public ICommand PassAnswer { get; }
 
     public ICommand NextRound => _nextRound;
 
@@ -655,6 +665,12 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private readonly bool _managed;
 
+    /// <summary>
+    /// The SIGame engine moves the game by itself (see <see cref="AppSettings.AutoHosting" />).
+    /// Fixed at game start: the engine rules cannot be changed during the game.
+    /// </summary>
+    private readonly bool _autoHosting;
+
     private readonly PresentationHandler? _presentationHandler;
     private readonly IPlatformService _platformService;
 
@@ -676,6 +692,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _presentationHandler = presentationHandler;
         _platformService = platformService;
         _managed = managed;
+        _autoHosting = managed && settings.Model.AutoHosting;
 
         LocalInfo = new TableInfoViewModel();
         Players = new ObservableCollection<PlayerInfo>();
@@ -684,7 +701,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         LocalInfo.ThemeSelected += ThemeInfo_Selected;
         LocalInfo.AnswerSelected += LocalInfo_AnswerSelected;
 
-        _presentationListener.Next = _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
+        _next = new SimpleUICommand(Next_Executed) { Name = Resources.Next };
+
+        // In automatic hosting the engine moves by itself, so a click on the board must not skip its pauses.
+        // The host's Next button still works
+        _presentationListener.Next = _autoHosting ? null : _next;
         _presentationListener.Back = _back = new SimpleCommand(Back_Executed);
         _presentationListener.Stop = _stop = new SimpleCommand(Stop_Executed);
 
@@ -698,6 +719,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         MakeStake = new SimpleCommand(MakeStake_Executed);
         AddStake = new SimpleCommand(AddStake_Executed);
         SubtractStake = new SimpleCommand(SubtractStake_Executed);
+        PassAnswer = new SimpleCommand(PassAnswer_Executed);
         MoveToContent = new ContextCommand(MoveToContent_Executed);
 
         RunRoundTimer = new SimpleUICommand(RunRoundTimer_Executed) { Name = Resources.Run };
@@ -838,6 +860,39 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
                 ReturnToQuestion();
             }
+        }
+        catch (Exception exc)
+        {
+            _platformService.ShowMessage($"{Resources.Error}: {exc.Message}");
+        }
+    }
+
+    private void PassAnswer_Executed(object? arg)
+    {
+        if (arg is not PlayerInfo player)
+        {
+            return;
+        }
+
+        try
+        {
+            if (_managed)
+            {
+                _gameActions.IsPassAnswer();
+                return;
+            }
+
+            if (!_isQuestion || !IsCommonPrice)
+            {
+                return;
+            }
+
+            // Score is not changed so nothing is pushed to _answeringHistory.
+            // The player stays in _selectedPlayers and therefore cannot press again on this question.
+            _gameLogger.Write("{0} pass", player.Name);
+            PresentationController.OnPlayerPassed(Players.IndexOf(player));
+            StopThinkingTimer_Executed(0);
+            ReturnToQuestion();
         }
         catch (Exception exc)
         {
@@ -1041,7 +1096,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         var player = (PlayerInfo)sender;
-        PresentationController.UpdatePlayerInfo(Players.IndexOf(player), player, e.PropertyName);
+        var playerIndex = Players.IndexOf(player);
+        PresentationController.UpdatePlayerInfo(playerIndex, player, e.PropertyName);
+
+        if (e.PropertyName == nameof(PlayerInfo.Name) && playerIndex > -1)
+        {
+            _gameActions.RenamePlayer(playerIndex, player);
+        }
     }
 
     private void QuestionTimer_Elapsed(object? state) =>
@@ -1987,6 +2048,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public bool IsQuestionFinished { get; internal set; }
 
+    /// <summary>
+    /// Player who has pressed the button and waits for the host decision.
+    /// </summary>
+    public PlayerInfo? AnsweringPlayer => _state == QuestionState.Pressed ? _selectedPlayer : null;
+
     private void UpdateCaption()
     {
         if (_currentTheme == null)
@@ -2021,7 +2087,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             SetSound(Settings.Model.Sounds.QuestionSelected);
             PresentationController.PlaySimpleSelection(themeIndex, questionIndex);
-            _gameActions.MoveNext(1700);
+
+            if (!_autoHosting) // Otherwise the engine waits for the selection animation itself
+            {
+                _gameActions.MoveNext(1700);
+            }
 
             _previousRound.CanBeExecuted = true;
 
@@ -2192,7 +2262,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         BlockNextButtonForAWhile();
 
-        _gameActions.PlayerPressed(player);
+        _gameActions.PlayerPressed(index, player);
 
         return true;
     }
@@ -2209,12 +2279,13 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         _next.CanBeExecuted = true;
     }
 
-    private void UnselectPlayer()
+    internal void UnselectPlayer()
     {
         if (_selectedPlayer != null)
         {
             _selectedPlayer.IsSelected = false;
             _selectedPlayer = null;
+            OnPropertyChanged(nameof(AnsweringPlayer));
         }
 
         PresentationController.ClearPlayersState();
@@ -2222,6 +2293,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     private void OnStateChanged()
     {
+        OnPropertyChanged(nameof(AnsweringPlayer));
+
         switch (_state)
         {
             case QuestionState.Pressing:
@@ -2318,7 +2391,17 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        UI.Execute(() => _buttonManager.Start(), exc => OnError(exc.Message));
+        // The flag is checked inside the UI action: Start and Stop are queued to the UI thread and must see each other's result.
+        // Repeated Start is not safe (a keyboard hook would leak, a COM port would fail to open twice)
+        UI.Execute(
+            () =>
+            {
+                if (!_buttonsStarted)
+                {
+                    _buttonsStarted = _buttonManager.Start();
+                }
+            },
+            exc => OnError(exc.Message));
     }
 
     private void StopButtons()
@@ -2328,10 +2411,34 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        UI.Execute(() => _buttonManager.Stop(), exc => OnError(exc.Message));
+        UI.Execute(
+            () =>
+            {
+                if (_buttonsStarted)
+                {
+                    _buttonManager.Stop();
+                    _buttonsStarted = false;
+                }
+            },
+            exc => OnError(exc.Message));
     }
 
     internal void AskAnswerButton() => State = QuestionState.Pressing;
+
+    /// <summary>
+    /// Allows all players to press again. In the old engine this is done by <see cref="ClearState" />,
+    /// which cannot be used with the SIGame engine because it also moves the game forward.
+    /// </summary>
+    internal void ResetPlayersQuestionState()
+    {
+        UnselectPlayer();
+        _selectedPlayers.Clear();
+
+        foreach (var player in Players)
+        {
+            player.BlockedTime = null;
+        }
+    }
 
     internal void OnQuestionStart()
     {

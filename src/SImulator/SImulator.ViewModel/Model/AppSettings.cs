@@ -773,6 +773,26 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private bool _autoHosting = false;
+
+    /// <summary>
+    /// SIGame engine runs the game by itself using its timers (question reading, buttons enabling, moving next).
+    /// The host only validates answers. Works only with <see cref="UseSIGameEngine" />.
+    /// </summary>
+    [DefaultValue(false)]
+    public bool AutoHosting
+    {
+        get => _autoHosting;
+        set
+        {
+            if (_autoHosting != value)
+            {
+                _autoHosting = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     #endregion
 
     public void Save(Stream stream, XmlSerializer? serializer = null)

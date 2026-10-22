@@ -195,6 +195,7 @@ public class Viewer : MessageHandler, IViewerClient
                                 players[i].Sum = sum;
                         }
 
+                        _controller.OnSums(players.Take(max).Select(p => p.Sum).ToArray());
                         break;
 
                         #endregion

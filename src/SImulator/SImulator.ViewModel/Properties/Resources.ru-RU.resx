@@ -288,4 +288,7 @@
   <data name="WrongAnswer" xml:space="preserve">
     <value>Неверный ответ</value>
   </data>
+  <data name="DefaultPlayerName" xml:space="preserve">
+    <value>Игрок {0}</value>
+  </data>
 </root>

@@ -133,6 +133,12 @@ public interface IPersonController
     void OnPlayerScoreChanged(int playerIndex, int newScore) { }
 
     /// <summary>
+    /// Players scores have been updated.
+    /// </summary>
+    /// <param name="sums">Scores by player index.</param>
+    void OnSums(IReadOnlyList<int> sums) { }
+
+    /// <summary>
     /// Updates account avatar.
     /// </summary>
     /// <param name="account">Account to update.</param>

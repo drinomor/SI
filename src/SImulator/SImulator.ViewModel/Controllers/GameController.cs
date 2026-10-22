@@ -148,10 +148,45 @@ internal sealed class GameController : IPersonController
 
     public void OnPersonFinalStake(int playerIndex) { }
 
-    public void OnPersonPass(int playerIndex)
+    public void OnSums(IReadOnlyList<int> sums)
     {
-        throw new NotImplementedException();
+        var players = GameViewModel.Players;
+
+        for (var i = 0; i < sums.Count && i < players.Count; i++)
+        {
+            players[i].Sum = sums[i];
+        }
     }
+
+    public void OnPlayerScoreChanged(int playerIndex, int newScore)
+    {
+        if (playerIndex >= 0 && playerIndex < GameViewModel.Players.Count)
+        {
+            GameViewModel.Players[playerIndex].Sum = newScore;
+        }
+    }
+
+    // Only counters are updated here: the score itself comes with the following SUMS message
+    public void OnPersonScoreChanged(int playerIndex, bool isRight, int sum)
+    {
+        if (playerIndex < 0 || playerIndex >= GameViewModel.Players.Count)
+        {
+            return;
+        }
+
+        var player = GameViewModel.Players[playerIndex];
+
+        if (isRight)
+        {
+            player.Right++;
+        }
+        else
+        {
+            player.Wrong++;
+        }
+    }
+
+    public void OnPersonPass(int playerIndex) => GameViewModel.PresentationController.OnPlayerPassed(playerIndex);
 
     public void OnPlayerOutcome(int playerIndex, bool isRight)
     {
@@ -212,6 +247,10 @@ internal sealed class GameController : IPersonController
 
     public void OnQuestionStart(string typeName, bool isDefaultType)
     {
+        GameViewModel.OnQuestionStart();
+        GameViewModel.ResetPlayersQuestionState();
+        GameViewModel.StartButtons(); // Buttons are activated in advance for false starts to work (same as in GameEngineController)
+
         if (isDefaultType)
         {
             return;
@@ -340,15 +379,11 @@ internal sealed class GameController : IPersonController
         throw new NotImplementedException();
     }
 
-    public void ReceiveText(Message m)
-    {
-        throw new NotImplementedException();
-    }
+    // There is no chat in SImulator
+    public void ReceiveText(Message m) { }
 
-    public void Resume()
-    {
-        throw new NotImplementedException();
-    }
+    // Media resuming is handled by the board itself from the raw message
+    public void Resume() { }
 
     public void SelectQuestion() => GameViewModel.PresentationController.AskToSelectQuestion();
 
@@ -408,6 +443,7 @@ internal sealed class GameController : IPersonController
 
     public void Try(bool questionNotFinished)
     {
+        GameViewModel.UnselectPlayer(); // Buttons are enabled again after a wrong answer or a pass
         GameViewModel.AskAnswerButton();
         GameViewModel.StartQuestionTimer();
     }

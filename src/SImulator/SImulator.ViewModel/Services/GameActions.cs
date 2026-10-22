@@ -86,5 +86,7 @@ internal sealed class GameActions : IGameActions, ITaskRunHandler<Tasks>
 
     public void IsWrongAnswer() => throw new NotImplementedException();
 
+    public void IsPassAnswer() => throw new NotImplementedException();
+
     public void SelectPlayer(int playerIndex) => throw new NotImplementedException();
 }

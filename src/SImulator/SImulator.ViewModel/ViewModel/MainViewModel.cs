@@ -529,7 +529,8 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             players[i] = new Account
             {
                 IsHuman = true,
-                Name = ""
+                // The engine identifies players by name, so names must be unique
+                Name = string.Format(Resources.DefaultPlayerName, i + 1)
             };
         }
 
@@ -550,7 +551,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         var rules = new SI.Contracts.RulesSettings
         {
-            Managed = true,
+            Managed = !Settings.AutoHosting,
             Oral = true,
             ButtonPressMode = SI.Contracts.ButtonPressMode.FirstWins,
             FalseStart = Settings.FalseStart,
@@ -614,11 +615,26 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         game.ClientData.ShowMan.IsConnected = true;
 
+        // Players with physical buttons have no network client, but the engine treats disconnected players as absent
+        // (e.g. a question ends after a wrong answer if no other connected player can press). Web players connect themselves
+        if (Settings.UsePlayersKeys != PlayerKeysModes.WebNew)
+        {
+            foreach (var player in game.ClientData.Players)
+            {
+                player.IsConnected = true;
+            }
+        }
+
         game.ClientData.EndUpdatePersons();
 
         game.Run();
 
-        var gameActions = new NewGameActions(actions, state, game.Authenticate, game.OnMessageReceivedAsync);
+        var gameActions = new NewGameActions(
+            actions,
+            state,
+            game.Authenticate,
+            game.OnMessageReceivedAsync,
+            (playerIndex, name) => game.RenamePlayerAsync(playerIndex, name));
 
         IGameLogger gameLogger;
 

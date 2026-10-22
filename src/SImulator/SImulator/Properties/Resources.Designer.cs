@@ -19,7 +19,7 @@ namespace SImulator.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -151,6 +151,33 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Answering.
+        /// </summary>
+        public static string AnsweringPlayer {
+            get {
+                return ResourceManager.GetString("AnsweringPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Right.
+        /// </summary>
+        public static string AnswerIsRight {
+            get {
+                return ResourceManager.GetString("AnswerIsRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong.
+        /// </summary>
+        public static string AnswerIsWrong {
+            get {
+                return ResourceManager.GetString("AnswerIsWrong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Answer options.
         /// </summary>
         public static string AnswerOptions {
@@ -210,6 +237,24 @@ namespace SImulator.Properties {
         public static string AuthorName {
             get {
                 return ResourceManager.GetString("AuthorName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatic hosting.
+        /// </summary>
+        public static string AutoHosting {
+            get {
+                return ResourceManager.GetString("AutoHosting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The engine reads the question, enables buttons and moves on by itself as in SIGame. The host only validates answers.
+        /// </summary>
+        public static string AutoHostingHint {
+            get {
+                return ResourceManager.GetString("AutoHostingHint", resourceCulture);
             }
         }
         
@@ -1002,6 +1047,15 @@ namespace SImulator.Properties {
         public static string Pass {
             get {
                 return ResourceManager.GetString("Pass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No points are deducted; the player cannot press again on this question.
+        /// </summary>
+        public static string PassAnswerHint {
+            get {
+                return ResourceManager.GetString("PassAnswerHint", resourceCulture);
             }
         }
         
