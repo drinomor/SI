@@ -137,8 +137,8 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
             line.Append(" out=").Append(string.Join(",", outIds));
         }
 
-        // The PASS button is not wired to the game engines yet
-        line.Append(" pass=0");
+        // PASS: declining the question, while players may press
+        line.Append(state.Phase == ButtonsPhase.Open ? " pass=1" : " pass=0");
 
         // The master plays a verdict once per change of its number, whatever the phase
         if (state.Verdict != null && DeviceId(state.Verdict.Player, players) is int verdictId)
@@ -269,7 +269,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
 
                     if (player != null)
                     {
-                        Listener.OnPlayerPassed(player.Name);
+                        Listener.OnPlayerPassed(player);
                     }
 
                     break;

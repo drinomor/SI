@@ -2199,6 +2199,44 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
     }
 
+    public void OnPlayerPassed(PlayerInfo player)
+    {
+        var index = Players.IndexOf(player);
+
+        if (index == -1)
+        {
+            return;
+        }
+
+        ProcessPlayerPass(index, player);
+    }
+
+    /// <summary>
+    /// A player declines to answer the current question while players may press.
+    /// </summary>
+    private void ProcessPlayerPass(int index, PlayerInfo player)
+    {
+        if (_state != QuestionState.Pressing || _selectedPlayers.Contains(player) || IsPaused)
+        {
+            return;
+        }
+
+        // Like a player who has answered: cannot press again in this question (see ProcessPlayerPress)
+        _selectedPlayers.Add(player);
+        _gameLogger.Write("{0} pass", player.Name);
+
+        if (_managed)
+        {
+            _gameActions.PlayerPassed(index, player); // the engine shows the pass (OnPersonPass)
+        }
+        else
+        {
+            PresentationController.OnPlayerPassed(index);
+        }
+
+        PublishButtonsState();
+    }
+
     public void OnPlayerStake(string playerName, int stake)
     {
         for (var i = 0; i < Players.Count; i++)

@@ -104,6 +104,20 @@ internal sealed class NewGameActions : IGameActions, ITaskRunHandler<Model.Tasks
         await _onMessageReceivedAsync(new Message(Messages.I, engineName));
     }
 
+    public async void PlayerPassed(int playerIndex, PlayerInfo player)
+    {
+        // Like a press: the engine takes the player by its own name. It answers with Messages.Pass for the player
+        // (GameController.OnPersonPass) and moves to the answer when nobody can press any more
+        var players = _state.Players;
+
+        if (playerIndex < 0 || playerIndex >= players.Count)
+        {
+            return;
+        }
+
+        await _onMessageReceivedAsync(new Message(Messages.Pass, players[playerIndex].Name));
+    }
+
     public async void RenamePlayer(int playerIndex, PlayerInfo player)
     {
         try

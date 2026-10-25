@@ -25,6 +25,11 @@ public interface IButtonManagerListener
     void OnPlayerPressed(string playerName) { }
 
     void OnPlayerPassed(string playerName) { }
+
+    /// <summary>
+    /// The player pressed PASS: declines to answer the current question.
+    /// </summary>
+    void OnPlayerPassed(PlayerInfo player) { }
     
     void OnPlayerAdded(string? id, string playerName) { }
 

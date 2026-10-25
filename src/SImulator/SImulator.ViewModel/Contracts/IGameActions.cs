@@ -38,6 +38,11 @@ public interface IGameActions : IDisposable
     void PlayerPressed(int playerIndex, PlayerInfo player) { }
 
     /// <summary>
+    /// The player declines to answer the current question (PASS button): the player cannot press it any more.
+    /// </summary>
+    void PlayerPassed(int playerIndex, PlayerInfo player) { }
+
+    /// <summary>
     /// Applies the player name edited by the host. May restore the previous name if the new one is rejected.
     /// </summary>
     void RenamePlayer(int playerIndex, PlayerInfo player) { }
