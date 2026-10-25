@@ -430,6 +430,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to QuizSet (ESP32 quiz buttons).
+        /// </summary>
+        public static string ButtonTypesQuizSet {
+            get {
+                return ResourceManager.GetString("ButtonTypesQuizSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Web access.
         /// </summary>
         public static string ButtonTypesWeb {
@@ -1362,6 +1371,42 @@ namespace SImulator.Properties {
         public static string QuestionTypeSimple {
             get {
                 return ResourceManager.GetString("QuestionTypeSimple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The buttons of an ESP32 quiz master connected to this computer by USB. Choose the master&apos;s serial port; on the master, switch the work mode to QuizSet (its menu or web page). The buttons show the game themselves: who may press, who is answering, who is out. Button 1 is the first player, button 2 the second, and so on..
+        /// </summary>
+        public static string QuizSetButtonsHint {
+            get {
+                return ResourceManager.GetString("QuizSetButtonsHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The buttons&apos; master is not in QuizSet mode: switch it on the master (menu or web page), the buttons will follow..
+        /// </summary>
+        public static string QuizSetNotActive {
+            get {
+                return ResourceManager.GetString("QuizSetNotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not open the buttons&apos; port {0}: {1}.
+        /// </summary>
+        public static string QuizSetPortError {
+            get {
+                return ResourceManager.GetString("QuizSetPortError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The buttons&apos; master speaks another QuizSet protocol version ({0}; version {1} is needed). Update the master or SImulator..
+        /// </summary>
+        public static string QuizSetProtocolMismatch {
+            get {
+                return ResourceManager.GetString("QuizSetProtocolMismatch", resourceCulture);
             }
         }
         

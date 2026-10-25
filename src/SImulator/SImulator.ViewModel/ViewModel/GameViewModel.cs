@@ -46,6 +46,18 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private bool _buttonsStarted;
 
     /// <summary>
+    /// Number of the current question for the buttons that show the game (<see cref="IGameStateButtons" />).
+    /// </summary>
+    private int _buttonsQuestion;
+
+    /// <summary>
+    /// The latest verdict in the current question for the buttons that show the game.
+    /// </summary>
+    private ButtonsVerdict? _buttonsVerdict;
+
+    private int _buttonsVerdictNumber;
+
+    /// <summary>
     /// Game log writer.
     /// </summary>
     private readonly IGameLogger _gameLogger;
@@ -791,6 +803,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _answeringHistory.Push(Tuple.Create(player, increment, true));
             PresentationController.PlayerIsRight(Players.IndexOf(player));
+            ShowVerdictOnButtons(player, true);
 
             if (IsCommonPrice)
             {
@@ -841,6 +854,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
             _gameLogger.Write("{0} -{1}", player.Name, substract);
             PresentationController.PlayerIsWrong(Players.IndexOf(player));
+            ShowVerdictOnButtons(player, false);
 
             if (IsCommonPrice)
             {
@@ -1813,6 +1827,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
         UnselectPlayer();
         _selectedPlayers.Clear();
+        PublishButtonsState();
 
         foreach (var player in Players)
         {
@@ -2289,11 +2304,48 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         PresentationController.ClearPlayersState();
+        PublishButtonsState();
+    }
+
+    /// <summary>
+    /// Tells the buttons that show the game themselves what to show. The only place that maps the game to the buttons.
+    /// </summary>
+    private void PublishButtonsState()
+    {
+        if (_buttonManager is not IGameStateButtons buttons)
+        {
+            return;
+        }
+
+        // Pressing is open only while the buttons listen; a player selected in Pressed / Thinking is answering
+        var phase = _selectedPlayer != null && (_state == QuestionState.Pressed || _state == QuestionState.Thinking)
+            ? ButtonsPhase.Locked
+            : _buttonsStarted && _state == QuestionState.Pressing ? ButtonsPhase.Open : ButtonsPhase.Idle;
+
+        // Players who have already answered this question may not press again (see ProcessPlayerPress)
+        var answered = _selectedPlayers.Where(player => player != _selectedPlayer).ToList();
+
+        buttons.OnGameStateChanged(new ButtonsGameState(
+            _buttonsQuestion,
+            phase,
+            phase == ButtonsPhase.Locked ? _selectedPlayer : null,
+            answered,
+            _buttonsVerdict));
+    }
+
+    /// <summary>
+    /// The host judged the player's answer: the player's button shows it (both engines come here).
+    /// </summary>
+    internal void ShowVerdictOnButtons(PlayerInfo player, bool isRight)
+    {
+        _buttonsVerdict = new ButtonsVerdict(player, isRight, ++_buttonsVerdictNumber);
+        PublishButtonsState();
     }
 
     private void OnStateChanged()
     {
         OnPropertyChanged(nameof(AnsweringPlayer));
+        PublishButtonsState();
 
         switch (_state)
         {
@@ -2399,6 +2451,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 if (!_buttonsStarted)
                 {
                     _buttonsStarted = _buttonManager.Start();
+                    PublishButtonsState();
                 }
             },
             exc => OnError(exc.Message));
@@ -2418,6 +2471,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 {
                     _buttonManager.Stop();
                     _buttonsStarted = false;
+                    PublishButtonsState();
                 }
             },
             exc => OnError(exc.Message));
@@ -2433,6 +2487,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     {
         UnselectPlayer();
         _selectedPlayers.Clear();
+        PublishButtonsState();
 
         foreach (var player in Players)
         {
@@ -2442,8 +2497,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     internal void OnQuestionStart()
     {
+        _buttonsQuestion++;
+        _buttonsVerdict = null;
         State = QuestionState.Normal;
         _previousState = QuestionState.Normal;
+        PublishButtonsState(); // State may have been Normal already
 
         _isQuestion = true;
 

@@ -778,4 +778,19 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="PartialTextHint" xml:space="preserve">
     <value>Текст вопроса появляется на табло постепенно, со скоростью чтения, вместо подсветки. Доступно только с движком SIGame и без фальстартов: кнопки открыты сразу, нажатие прерывает вывод текста</value>
   </data>
+  <data name="ButtonTypesQuizSet" xml:space="preserve">
+    <value>QuizSet (кнопки ESP32)</value>
+  </data>
+  <data name="QuizSetButtonsHint" xml:space="preserve">
+    <value>Кнопки викторины на ESP32: мастер подключен к этому компьютеру по USB. Выберите COM-порт мастера; на мастере включите режим работы QuizSet (в его меню или веб-интерфейсе). Кнопки сами показывают ход игры: кто может нажимать, кто отвечает, кто выбыл. Кнопка 1 — первый игрок, кнопка 2 — второй и т. д.</value>
+  </data>
+  <data name="QuizSetPortError" xml:space="preserve">
+    <value>Не удалось открыть порт кнопок {0}: {1}</value>
+  </data>
+  <data name="QuizSetNotActive" xml:space="preserve">
+    <value>Мастер кнопок не в режиме QuizSet: включите режим на мастере (в меню или веб-интерфейсе), и кнопки подключатся.</value>
+  </data>
+  <data name="QuizSetProtocolMismatch" xml:space="preserve">
+    <value>Мастер кнопок использует другую версию протокола QuizSet ({0}; нужна версия {1}). Обновите прошивку мастера или SImulator.</value>
+  </data>
 </root>

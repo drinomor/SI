@@ -184,6 +184,8 @@ internal sealed class GameController : IPersonController
         {
             player.Wrong++;
         }
+
+        GameViewModel.ShowVerdictOnButtons(player, isRight);
     }
 
     public void OnPersonPass(int playerIndex) => GameViewModel.PresentationController.OnPlayerPassed(playerIndex);

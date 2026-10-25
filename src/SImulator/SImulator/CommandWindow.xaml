@@ -90,6 +90,7 @@
                         <x:Static x:Key="Joystick" Member="lp:Resources.ButtonTypesJoystick" />
                         <x:Static x:Key="Com" Member="lp:Resources.ButtonTypesCom" />
                         <x:Static x:Key="WebNew" Member="lp:Resources.ButtonTypesWeb" />
+                        <x:Static x:Key="QuizSet" Member="lp:Resources.ButtonTypesQuizSet" />
                     </my:StringDictionary>
                 </my:MappedConverter.Map>
             </my:MappedConverter>
@@ -1912,9 +1913,31 @@
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.Com}">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.QuizSet}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
+
+                    <TextBlock
+                        FontStyle="Italic"
+                        Margin="0,5,0,0"
+                        TextWrapping="Wrap"
+                        Text="{x:Static lp:Resources.QuizSetButtonsHint}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.QuizSet}">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
 
                     <TextBlock Style="{StaticResource Header}" Text="{x:Static lp:Resources.ComPortNumber}" />
                     <ComboBox Margin="0,5" ItemsSource="{Binding ComPorts}" SelectedItem="{Binding Settings.ComPort}" />
@@ -1934,6 +1957,10 @@
                                 </DataTrigger>
 
                                 <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.WebNew}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.QuizSet}">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>

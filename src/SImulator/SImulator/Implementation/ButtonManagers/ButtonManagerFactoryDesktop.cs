@@ -16,6 +16,7 @@ internal sealed class ButtonManagerFactoryDesktop : ButtonManagerFactory
             PlayerKeysModes.Joystick => new JoystickListener(buttonManagerListener),
             PlayerKeysModes.Com => new ComButtonManager(settings.ComPort, buttonManagerListener),
             PlayerKeysModes.WebNew => await WebManagerNew.CreateAsync(settings.WebPort, buttonManagerListener, platformService),
+            PlayerKeysModes.QuizSet => QuizSetButtonManager.TryCreate(settings.ComPort, buttonManagerListener),
             _ => await base.CreateAsync(settings, buttonManagerListener, platformService),
         };
 }

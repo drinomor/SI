@@ -777,4 +777,19 @@ To play, you need to organize a local network.</value>
   <data name="PartialTextHint" xml:space="preserve">
     <value>The question text appears on the board gradually at the reading speed instead of being highlighted. Available only with the SIGame engine and without false starts: buttons are enabled at once and a press interrupts the text</value>
   </data>
+  <data name="ButtonTypesQuizSet" xml:space="preserve">
+    <value>QuizSet (ESP32 quiz buttons)</value>
+  </data>
+  <data name="QuizSetButtonsHint" xml:space="preserve">
+    <value>The buttons of an ESP32 quiz master connected to this computer by USB. Choose the master's serial port; on the master, switch the work mode to QuizSet (its menu or web page). The buttons show the game themselves: who may press, who is answering, who is out. Button 1 is the first player, button 2 the second, and so on.</value>
+  </data>
+  <data name="QuizSetPortError" xml:space="preserve">
+    <value>Could not open the buttons' port {0}: {1}</value>
+  </data>
+  <data name="QuizSetNotActive" xml:space="preserve">
+    <value>The buttons' master is not in QuizSet mode: switch it on the master (menu or web page), the buttons will follow.</value>
+  </data>
+  <data name="QuizSetProtocolMismatch" xml:space="preserve">
+    <value>The buttons' master speaks another QuizSet protocol version ({0}; version {1} is needed). Update the master or SImulator.</value>
+  </data>
 </root>

@@ -17,6 +17,10 @@ public enum PlayerKeysModes
     Joystick,
     Com,
     WebNew,
+    /// <summary>
+    /// Quiz buttons of an ESP32 master linked over its USB serial port: the buttons show the game (QuizSet protocol).
+    /// </summary>
+    QuizSet,
 }
 
 /// <summary>
