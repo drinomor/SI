@@ -165,6 +165,44 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
     public override Task<int?> CountConnectedButtonsAsync(string portName) =>
         ButtonManagers.QuizSetButtonManager.CountConnectedButtonsAsync(portName);
 
+    /// <summary>
+    /// The QuizSet port is interface 1 of the master's composite USB device (keyboard + serial port). Windows keeps
+    /// "USB device interface -> COM port" in the registry, also for devices unplugged long ago, so only the ports present
+    /// now count.
+    /// </summary>
+    public override string[] GetQuizSetPorts()
+    {
+        var present = SerialPort.GetPortNames();
+        var ports = new List<string>();
+
+        try
+        {
+            using var device = Registry.LocalMachine.OpenSubKey(
+                $@"SYSTEM\CurrentControlSet\Enum\USB\{QuizSetButtonManager.UsbInterfaceId}");
+
+            if (device == null)
+            {
+                return [];
+            }
+
+            foreach (var instance in device.GetSubKeyNames())
+            {
+                using var parameters = device.OpenSubKey($@"{instance}\Device Parameters");
+
+                if (parameters?.GetValue("PortName") is string port && present.Contains(port) && !ports.Contains(port))
+                {
+                    ports.Add(port);
+                }
+            }
+        }
+        catch (Exception exc) when (exc is System.Security.SecurityException or UnauthorizedAccessException or IOException)
+        {
+            return []; // no access to the registry: the host chooses among all the ports in COM mode
+        }
+
+        return [.. ports];
+    }
+
     public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
 
     public override int GetKeyNumber(GameKey key)

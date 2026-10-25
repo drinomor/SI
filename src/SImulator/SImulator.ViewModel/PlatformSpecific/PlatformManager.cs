@@ -48,6 +48,11 @@ public abstract class PlatformManager
     public abstract string[] GetComPorts();
 
     /// <summary>
+    /// The serial ports of the QuizSet buttons' masters connected now (found by their USB identifiers).
+    /// </summary>
+    public virtual string[] GetQuizSetPorts() => [];
+
+    /// <summary>
     /// Asks the buttons' master on the port how many buttons are connected (QuizSet). Null if it cannot tell (the
     /// reason is shown to the host).
     /// </summary>

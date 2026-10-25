@@ -122,7 +122,8 @@ public partial class App : Application
                 ContentUri = new Uri("https://vladimirkhil.com/sistorage/packages/d8faa1a4-2a6f-4103-b298-fd15c6ee3ea6.siq")
             });
 
-        Settings.ScreenNumber = 2;
+        // The screen: MainViewModel chooses the window in development builds (a fixed index was the browser with one
+        // monitor)
 #else
         ProcessAsync();
 #endif

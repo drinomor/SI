@@ -35,6 +35,12 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     /// </summary>
     internal const string PlayerIdPrefix = "quizset:";
 
+    /// <summary>
+    /// The master's USB serial port: Espressif's vendor id, the product id esp_tinyusb gives a keyboard + serial port
+    /// device, interface 1 (0 is the keyboard). Firmware: components/hid/hid_usb.c.
+    /// </summary>
+    internal const string UsbInterfaceId = "VID_303A&PID_4005&MI_01";
+
     private readonly SerialPort _port;
     private readonly Timer _repeatTimer;
 

@@ -136,7 +136,26 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         return ports;
     }
 
-    public string[] ComPorts => _comPorts.Value;
+    /// <summary>
+    /// QuizSet: only the ports of the buttons' masters (read anew, the master may be plugged in meanwhile).
+    /// </summary>
+    public string[] ComPorts =>
+        Settings.UsePlayersKeys == PlayerKeysModes.QuizSet ? PlatformManager.Instance.GetQuizSetPorts() : _comPorts.Value;
+
+    /// <summary>
+    /// The chosen port must be one of <see cref="ComPorts" />: the first one otherwise.
+    /// </summary>
+    private void UpdateComPorts()
+    {
+        var ports = ComPorts;
+
+        if (ports.Length > 0 && !ports.Contains(Settings.ComPort))
+        {
+            Settings.ComPort = ports[0];
+        }
+
+        OnPropertyChanged(nameof(ComPorts));
+    }
 
     private GameViewModel? _game;
 
@@ -252,7 +271,9 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         var screensLength = Screens.Length;
 
 #if DEBUG
-        Settings.ScreenNumber = GetDefaultScreenIndex();
+        // Development: the board in a window, not over a whole screen. The first windowed screen is the window, the
+        // browser comes after it (DesktopManager.GetScreens)
+        Settings.ScreenNumber = Math.Max(0, Array.FindIndex(Screens, screen => !screen.IsFullScreen));
 #else
         if (Settings.ScreenNumber == -1 || Settings.ScreenNumber >= screensLength)
         {
@@ -261,6 +282,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 #endif
 
         Settings.PropertyChanged += Settings_PropertyChanged;
+
+        if (Settings.UsePlayersKeys == PlayerKeysModes.QuizSet)
+        {
+            UpdateComPorts();
+        }
 
         var links = new List<LinkModel>
         {
@@ -346,6 +372,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
             case nameof(AppSettings.UsePlayersKeys):
                 Settings.PlayerKeys2.Clear();
                 UpdateCanAddPlayerButton();
+                UpdateComPorts();
                 break;
 
             case nameof(AppSettings.PlayersView):
