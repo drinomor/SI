@@ -158,6 +158,21 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public SimpleCommand KickPlayer { get; private set; }
 
+    /// <summary>
+    /// Takes the players from the buttons (<see cref="IButtonPlayersSource" />), between questions.
+    /// </summary>
+    public SimpleCommand SyncButtonPlayers { get; private set; }
+
+    /// <summary>
+    /// The player's button shows itself (<see cref="IButtonPlayersSource" />), between questions.
+    /// </summary>
+    public SimpleCommand IdentifyButton { get; private set; }
+
+    /// <summary>
+    /// The buttons know their players: the commands above are shown.
+    /// </summary>
+    public bool HasButtonPlayers => _buttonManager is IButtonPlayersSource;
+
     public SimpleCommand ResetSums { get; private set; }
 
     public ICommand GiveTurn { get; private set; }
@@ -725,6 +740,14 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         RemovePlayer = new SimpleCommand(RemovePlayer_Executed);
         ClearPlayers = new SimpleCommand(ClearPlayers_Executed);
         KickPlayer = new SimpleCommand(KickPlayer_Executed);
+        SyncButtonPlayers = new SimpleCommand(_ => (_buttonManager as IButtonPlayersSource)?.SyncPlayers());
+        IdentifyButton = new SimpleCommand(arg =>
+        {
+            if (arg is PlayerInfo player)
+            {
+                (_buttonManager as IButtonPlayersSource)?.IdentifyPlayer(player);
+            }
+        });
         ResetSums = new SimpleCommand(ResetSums_Executed);
         GiveTurn = new SimpleCommand(GiveTurn_Executed);
         Pass = new SimpleCommand(Pass_Executed);
@@ -1366,6 +1389,19 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         ActiveMediaCommand = RunMediaTimer;
     }
 
+    /// <summary>
+    /// Players are taken from the buttons and buttons identified only between questions (buttons not listening):
+    /// adding a player in the middle of a question is not supported by every engine, and the identification effect
+    /// would cover the button's game indication.
+    /// </summary>
+    private void UpdateButtonPlayersCommands()
+    {
+        SyncButtonPlayers.CanBeExecuted = !_buttonsStarted;
+        IdentifyButton.CanBeExecuted = !_buttonsStarted;
+    }
+
+    public void AddPlayerForButton() => _gameActions.AddPlayer();
+
     internal void AddPlayerCore(PlayerInfo player)
     {
         player.PropertyChanged += PlayerInfo_PropertyChanged;
@@ -1455,6 +1491,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         {
             ManagedMode = true;
         }
+
+        OnPropertyChanged(nameof(HasButtonPlayers));
 
         await PresentationController.StartAsync(InitPresentation);
 
@@ -2490,6 +2528,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                 {
                     _buttonsStarted = _buttonManager.Start();
                     PublishButtonsState();
+                    UpdateButtonPlayersCommands();
                 }
             },
             exc => OnError(exc.Message));
@@ -2510,6 +2549,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
                     _buttonManager.Stop();
                     _buttonsStarted = false;
                     PublishButtonsState();
+                    UpdateButtonPlayersCommands();
                 }
             },
             exc => OnError(exc.Message));

@@ -1274,6 +1274,25 @@
                              VerticalAlignment="Center" />
 
                         <TextBlock Margin="10,0,0,2" FontSize="16" VerticalAlignment="Center" Text="{Binding Settings.PlayerCount}" />
+
+                        <Button
+                            Margin="15,0,0,0"
+                            Padding="10,2"
+                            VerticalAlignment="Center"
+                            Command="{Binding TakePlayersFromButtons}"
+                            Content="{x:Static lp:Resources.TakePlayersFromButtons}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Settings.UsePlayersKeys}" Value="{x:Static vmc:PlayerKeysModes.QuizSet}">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
                 

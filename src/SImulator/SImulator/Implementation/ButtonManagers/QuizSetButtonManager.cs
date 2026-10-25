@@ -2,6 +2,7 @@ using SImulator.Properties;
 using SImulator.ViewModel;
 using SImulator.ViewModel.ButtonManagers;
 using SImulator.ViewModel.Model;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
@@ -17,14 +18,17 @@ namespace SImulator.Implementation.ButtonManagers;
 /// The buttons show the game themselves: the game state goes to the master as an "S ..." line on every change and
 /// again every second (the master treats a silence of 3 s as a lost link). The master sends every press back
 /// ("PRESS id" / "PASS id") in the order the presses came; who was first is decided here, as for other buttons.
+/// Players are bound to buttons by the button number (<see cref="PlayerIdPrefix" /> in <see cref="PlayerInfo.Id" />):
+/// the buttons connected at the game start, and later ones when the host takes the players from the buttons.
+/// Names go both ways: the master's name (if set) is taken on binding and when changed there, a name changed here goes
+/// to the master.
 /// Protocol: components/quizset/include/quizset.h of the quiz firmware.
-/// Button number id is player number id (in the players' order) until players are bound to the buttons.
 /// </remarks>
-internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButtons
+internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButtons, IButtonPlayersSource
 {
     private const int ProtocolVersion = 1;
-    private const int MaxDeviceId = 32;
     private static readonly TimeSpan RepeatPeriod = TimeSpan.FromSeconds(1);
+    private static readonly TimeSpan QueryTimeout = TimeSpan.FromSeconds(2);
 
     /// <summary>
     /// Player identifier prefix of a player bound to a button: "quizset:3" is button 3.
@@ -49,10 +53,46 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     /// </summary>
     private readonly List<byte> _received = new();
 
+    // The fields below are used on the UI thread only (game calls and HandleLine)
+
     /// <summary>
-    /// Problems already shown to the host (UI thread only): a message box once, not every second.
+    /// Problems already shown to the host: a message box once, not every second.
     /// </summary>
     private readonly HashSet<string> _reported = new();
+
+    private sealed record ButtonInfo(bool IsOn, string Name);
+
+    /// <summary>
+    /// The master's registered buttons by number, from "PLAYER ..." lines.
+    /// </summary>
+    private readonly Dictionary<int, ButtonInfo> _buttons = new();
+
+    /// <summary>
+    /// Buttons taken into the game (connected at the latest sync): each one gets a player.
+    /// </summary>
+    private readonly SortedSet<int> _accepted = new();
+
+    /// <summary>
+    /// "PLAYERS?" was sent for a sync: the answer's end takes the connected buttons.
+    /// </summary>
+    private bool _syncListPending;
+
+    /// <summary>
+    /// A sync may add players until every accepted button has one.
+    /// </summary>
+    private bool _syncAdding;
+
+    /// <summary>
+    /// Players count when a player was requested: one request at a time (the engine adds players asynchronously).
+    /// </summary>
+    private int _playersCountAtAdd = -1;
+
+    private ButtonsGameState? _lastState;
+
+    /// <summary>
+    /// Bound players whose renames go to the master.
+    /// </summary>
+    private readonly HashSet<PlayerInfo> _watched = new();
 
     private QuizSetButtonManager(SerialPort port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
@@ -62,9 +102,71 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     }
 
     /// <summary>
-    /// Opens the port for the whole game. Returns null (the error is shown) if it cannot be opened.
+    /// Opens the port for the whole game and takes the connected buttons as players. Returns null (the error is shown)
+    /// if the port cannot be opened.
     /// </summary>
     internal static QuizSetButtonManager? TryCreate(string portName, IButtonManagerListener buttonManagerListener)
+    {
+        var port = OpenPort(portName);
+
+        if (port == null)
+        {
+            return null;
+        }
+
+        var manager = new QuizSetButtonManager(port, buttonManagerListener);
+        manager.Send($"HELLO quizset {ProtocolVersion}");
+        manager.Repeat(); // dark buttons at once: in the master's free phase every press would be a false start here
+        manager.SyncPlayers();
+        return manager;
+    }
+
+    /// <summary>
+    /// Settings, before the game: how many buttons are connected now. Null if the master does not answer (shown).
+    /// </summary>
+    internal static async Task<int?> CountConnectedButtonsAsync(string portName)
+    {
+        using var port = OpenPort(portName);
+
+        if (port == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return await Task.Run(() =>
+            {
+                port.ReadTimeout = (int)QueryTimeout.TotalMilliseconds;
+                port.NewLine = "\n";
+                port.Encoding = Encoding.UTF8;
+                port.Write("PLAYERS?\n");
+                var count = 0;
+
+                while (true)
+                {
+                    var line = port.ReadLine().TrimEnd('\r');
+
+                    if (line == "PLAYERS END")
+                    {
+                        return count;
+                    }
+
+                    if (TryParsePlayer(line, out _, out var button) && button is { IsOn: true })
+                    {
+                        count++;
+                    }
+                }
+            });
+        }
+        catch (Exception exc) when (exc is TimeoutException or InvalidOperationException or IOException)
+        {
+            ShowError(string.Format(Resources.QuizSetNoAnswer, portName));
+            return null;
+        }
+    }
+
+    private static SerialPort? OpenPort(string portName)
     {
         // Without DTR the master treats the port as closed and drops what it writes
         var port = new SerialPort(portName, 115200) { DtrEnable = true, WriteTimeout = 500 };
@@ -72,6 +174,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         try
         {
             port.Open();
+            return port;
         }
         catch (Exception exc)
         {
@@ -79,11 +182,6 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
             ShowError(string.Format(Resources.QuizSetPortError, portName, exc.Message));
             return null;
         }
-
-        var manager = new QuizSetButtonManager(port, buttonManagerListener);
-        manager.Send($"HELLO quizset {ProtocolVersion}");
-        manager.Repeat(); // dark buttons at once: in the master's free phase every press would be a false start here
-        return manager;
     }
 
     // The port stays open for the whole game: the buttons follow the game state, not Start / Stop
@@ -93,6 +191,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
 
     public void OnGameStateChanged(ButtonsGameState state)
     {
+        _lastState = state;
         var line = BuildStateLine(state);
 
         lock (_sendLock)
@@ -108,12 +207,45 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         Send(line);
     }
 
+    /// <summary>
+    /// The players have changed (added, removed, or all of them created anew by the engine): bind the accepted buttons
+    /// again.
+    /// </summary>
+    public override void OnPlayersChanged()
+    {
+        var players = Listener.GamePlayers.ToHashSet();
+
+        foreach (var gone in _watched.Where(player => !players.Contains(player)).ToList())
+        {
+            gone.PropertyChanged -= Player_PropertyChanged;
+            _watched.Remove(gone);
+        }
+
+        BindAcceptedButtons();
+    }
+
+    public void SyncPlayers()
+    {
+        _syncListPending = true;
+        Send("PLAYERS?"); // a fresh list: the answer's end continues in HandleLine
+    }
+
+    public void IdentifyPlayer(PlayerInfo player)
+    {
+        if (DeviceId(player) is int id)
+        {
+            Send($"IDENT {id}");
+        }
+        else
+        {
+            ShowError(string.Format(Resources.QuizSetPlayerWithoutButton, player.Name));
+        }
+    }
+
     private string BuildStateLine(ButtonsGameState state)
     {
-        var players = Listener.GamePlayers.ToList();
         var line = new StringBuilder($"S round={state.Question}");
-
-        var answering = state.Answering != null ? DeviceId(state.Answering, players) : null;
+        var answering = state.Answering != null ? DeviceId(state.Answering) : null;
 
         switch (state.Phase)
         {
@@ -130,7 +262,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
                 break;
         }
 
-        var outIds = state.Out.Select(player => DeviceId(player, players)).Where(id => id.HasValue).ToList();
+        var outIds = state.Out.Select(DeviceId).Where(id => id.HasValue).ToList();
 
         if (outIds.Count > 0)
         {
@@ -141,7 +273,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         line.Append(state.Phase == ButtonsPhase.Open ? " pass=1" : " pass=0");
 
         // The master plays a verdict once per change of its number, whatever the phase
-        if (state.Verdict != null && DeviceId(state.Verdict.Player, players) is int verdictId)
+        if (state.Verdict != null && DeviceId(state.Verdict.Player) is int verdictId)
         {
             line.Append($" verdict={verdictId}:{(state.Verdict.IsRight ? "correct" : "wrong")}:{state.Verdict.Number}");
         }
@@ -149,33 +281,153 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         return line.ToString();
     }
 
-    private static int? DeviceId(PlayerInfo player, IList<PlayerInfo> players)
-    {
-        if (player.Id != null && player.Id.StartsWith(PlayerIdPrefix) && int.TryParse(player.Id[PlayerIdPrefix.Length..], out var id))
-        {
-            return id;
-        }
+    private static int? DeviceId(PlayerInfo player) =>
+        player.Id != null && player.Id.StartsWith(PlayerIdPrefix) && int.TryParse(player.Id[PlayerIdPrefix.Length..], out var id)
+            ? id
+            : null;
 
-        var index = players.IndexOf(player);
-        return index >= 0 && index < MaxDeviceId ? index + 1 : null;
-    }
+    private static bool IsBound(PlayerInfo player) => DeviceId(player).HasValue;
 
-    private PlayerInfo? FindPlayer(int deviceId)
+    private PlayerInfo? FindPlayer(int deviceId) =>
+        Listener.GamePlayers.FirstOrDefault(player => player.Id == PlayerIdPrefix + deviceId);
+
+    /// <summary>
+    /// Gives every accepted button without a player one: an unbound player with the button's name, any unbound
+    /// player, or (during a sync) a new one.
+    /// </summary>
+    private void BindAcceptedButtons()
     {
         var players = Listener.GamePlayers.ToList();
-        var bound = players.FirstOrDefault(player => player.Id == PlayerIdPrefix + deviceId);
+        var changed = false;
 
-        if (bound != null)
+        foreach (var id in _accepted)
         {
-            return bound;
+            if (FindPlayer(id) != null)
+            {
+                continue;
+            }
+
+            var name = _buttons.TryGetValue(id, out var button) ? button.Name : "";
+
+            var player = players.FirstOrDefault(p => !IsBound(p) && name.Length > 0 && p.Name == name)
+                ?? players.FirstOrDefault(p => !IsBound(p));
+
+            if (player == null)
+            {
+                if (_syncAdding && players.Count != _playersCountAtAdd)
+                {
+                    _playersCountAtAdd = players.Count;
+                    Listener.AddPlayerForButton(); // OnPlayersChanged continues when the player is there
+                }
+
+                break;
+            }
+
+            player.Id = PlayerIdPrefix + id;
+            changed = true;
+
+            if (_watched.Add(player))
+            {
+                player.PropertyChanged += Player_PropertyChanged;
+            }
+
+            // The master's name, when it has one; otherwise the name given here stays
+            if (name.Length > 0 && player.Name != name)
+            {
+                player.Name = name;
+            }
         }
 
-        // By order, unless that player is bound to another button
-        var index = deviceId - 1;
+        if (_accepted.All(id => FindPlayer(id) != null))
+        {
+            _syncAdding = false;
+        }
 
-        return index >= 0 && index < players.Count && players[index].Id?.StartsWith(PlayerIdPrefix) != true
-            ? players[index]
-            : null;
+        if (changed && _lastState != null)
+        {
+            OnGameStateChanged(_lastState); // the buttons of the new players
+        }
+    }
+
+    /// <summary>
+    /// A bound player renamed here (by the host, or by the game engine restoring a refused name): tell the master.
+    /// </summary>
+    private void Player_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(PlayerInfo.Name) || sender is not PlayerInfo player || DeviceId(player) is not int id)
+        {
+            return;
+        }
+
+        // Not back: a name that came from the master is already the master's
+        if (_buttons.TryGetValue(id, out var button) && button.Name == player.Name)
+        {
+            return;
+        }
+
+        Send($"NAME {id} {player.Name}");
+    }
+
+    /// <summary>
+    /// "PLAYER id on|off [name]" or "PLAYER id removed"; removed buttons come as null.
+    /// </summary>
+    private static bool TryParsePlayer(string line, out int id, out ButtonInfo? button)
+    {
+        button = null;
+        var parts = line.Split(' ', 4);
+
+        if (parts.Length < 3 || parts[0] != "PLAYER" || !int.TryParse(parts[1], out id))
+        {
+            id = 0;
+            return false;
+        }
+
+        if (parts[2] != "removed")
+        {
+            button = new ButtonInfo(parts[2] == "on", parts.Length == 4 ? parts[3] : "");
+        }
+
+        return true;
+    }
+
+    private void OnButtonChanged(int id, ButtonInfo? button)
+    {
+        if (button == null)
+        {
+            _buttons.Remove(id); // the player stays, with the scores; no presses come for it any more
+            return;
+        }
+
+        _buttons[id] = button;
+
+        // A name set on the master (its web page) comes here; an empty one does not clear the name here
+        if (button.Name.Length > 0 && FindPlayer(id) is PlayerInfo player && player.Name != button.Name)
+        {
+            player.Name = button.Name;
+        }
+    }
+
+    private void OnPlayersListEnd()
+    {
+        if (!_syncListPending)
+        {
+            return;
+        }
+
+        _syncListPending = false;
+
+        // Only connected buttons become players; those already taken stay taken
+        foreach (var (id, button) in _buttons)
+        {
+            if (button.IsOn)
+            {
+                _accepted.Add(id);
+            }
+        }
+
+        _syncAdding = true;
+        _playersCountAtAdd = -1;
+        BindAcceptedButtons();
     }
 
     private void Repeat()
@@ -247,6 +499,12 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     /// </summary>
     private void HandleLine(string line)
     {
+        if (TryParsePlayer(line, out var buttonId, out var button))
+        {
+            OnButtonChanged(buttonId, button);
+            return;
+        }
+
         var parts = line.Split(' ');
 
         switch (parts[0])
@@ -275,6 +533,10 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
                     break;
                 }
 
+            case "PLAYERS" when line == "PLAYERS END":
+                OnPlayersListEnd();
+                break;
+
             case "HELLO":
                 // HELLO quizset <version> <firmware> active=<0|1>
                 if (parts.Length < 3 || parts[2] != ProtocolVersion.ToString())
@@ -292,12 +554,16 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
                 ReportOnce(Resources.QuizSetNotActive);
                 break;
 
+            case "ERR" when parts.Length > 3 && parts[1] == "NAME" && line.Contains("too long"):
+                ShowError(Resources.QuizSetNameTooLong);
+                break;
+
             case "ERR":
                 Trace.TraceWarning("QuizSet: {0}", line);
                 break;
 
             default:
-                break; // PLAYER lines and replies: not used yet
+                break; // OK replies
         }
     }
 
@@ -313,6 +579,13 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     {
         _repeatTimer.Dispose();
         _port.DataReceived -= Port_DataReceived;
+
+        foreach (var player in _watched)
+        {
+            player.PropertyChanged -= Player_PropertyChanged;
+        }
+
+        _watched.Clear();
         Send("S round=0 phase=idle"); // the buttons go dark at once, not after the master's 3 s timeout
         _port.Dispose();
         return new ValueTask();

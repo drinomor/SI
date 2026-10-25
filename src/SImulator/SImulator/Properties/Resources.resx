@@ -792,4 +792,19 @@ To play, you need to organize a local network.</value>
   <data name="QuizSetProtocolMismatch" xml:space="preserve">
     <value>The buttons' master speaks another QuizSet protocol version ({0}; version {1} is needed). Update the master or SImulator.</value>
   </data>
+  <data name="TakePlayersFromButtons" xml:space="preserve">
+    <value>Take players from the buttons' master</value>
+  </data>
+  <data name="IdentifyButton" xml:space="preserve">
+    <value>Show the player's button (it blinks)</value>
+  </data>
+  <data name="QuizSetNoAnswer" xml:space="preserve">
+    <value>The buttons' master on port {0} does not answer. Is the port the master's, and is the master on?</value>
+  </data>
+  <data name="QuizSetPlayerWithoutButton" xml:space="preserve">
+    <value>Player {0} has no button. Take the players from the buttons' master between questions.</value>
+  </data>
+  <data name="QuizSetNameTooLong" xml:space="preserve">
+    <value>The buttons' master keeps names up to 23 bytes (about 11 Cyrillic or 23 Latin letters): the name stays only here.</value>
+  </data>
 </root>

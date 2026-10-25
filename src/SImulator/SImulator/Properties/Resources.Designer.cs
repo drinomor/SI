@@ -874,6 +874,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show the player&apos;s button (it blinks).
+        /// </summary>
+        public static string IdentifyButton {
+            get {
+                return ResourceManager.GetString("IdentifyButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Image.
         /// </summary>
         public static string Image {
@@ -1384,11 +1393,38 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The buttons&apos; master keeps names up to 23 bytes (about 11 Cyrillic or 23 Latin letters): the name stays only here..
+        /// </summary>
+        public static string QuizSetNameTooLong {
+            get {
+                return ResourceManager.GetString("QuizSetNameTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The buttons&apos; master on port {0} does not answer. Is the port the master&apos;s, and is the master on?.
+        /// </summary>
+        public static string QuizSetNoAnswer {
+            get {
+                return ResourceManager.GetString("QuizSetNoAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The buttons&apos; master is not in QuizSet mode: switch it on the master (menu or web page), the buttons will follow..
         /// </summary>
         public static string QuizSetNotActive {
             get {
                 return ResourceManager.GetString("QuizSetNotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Player {0} has no button. Take the players from the buttons&apos; master between questions..
+        /// </summary>
+        public static string QuizSetPlayerWithoutButton {
+            get {
+                return ResourceManager.GetString("QuizSetPlayerWithoutButton", resourceCulture);
             }
         }
         
@@ -1878,6 +1914,15 @@ namespace SImulator.Properties {
         public static string TableHotKeysHint {
             get {
                 return ResourceManager.GetString("TableHotKeysHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Take players from the buttons&apos; master.
+        /// </summary>
+        public static string TakePlayersFromButtons {
+            get {
+                return ResourceManager.GetString("TakePlayersFromButtons", resourceCulture);
             }
         }
         

@@ -47,6 +47,12 @@ public abstract class PlatformManager
 
     public abstract string[] GetComPorts();
 
+    /// <summary>
+    /// Asks the buttons' master on the port how many buttons are connected (QuizSet). Null if it cannot tell (the
+    /// reason is shown to the host).
+    /// </summary>
+    public virtual Task<int?> CountConnectedButtonsAsync(string portName) => Task.FromResult<int?>(null);
+
     public abstract bool IsEscapeKey(GameKey key);
 
     public abstract int GetKeyNumber(GameKey key);

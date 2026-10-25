@@ -793,4 +793,19 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="QuizSetProtocolMismatch" xml:space="preserve">
     <value>Мастер кнопок использует другую версию протокола QuizSet ({0}; нужна версия {1}). Обновите прошивку мастера или SImulator.</value>
   </data>
+  <data name="TakePlayersFromButtons" xml:space="preserve">
+    <value>Взять игроков с мастера кнопок</value>
+  </data>
+  <data name="IdentifyButton" xml:space="preserve">
+    <value>Подсветить кнопку игрока</value>
+  </data>
+  <data name="QuizSetNoAnswer" xml:space="preserve">
+    <value>Мастер кнопок на порту {0} не отвечает. Это порт мастера и мастер включен?</value>
+  </data>
+  <data name="QuizSetPlayerWithoutButton" xml:space="preserve">
+    <value>У игрока {0} нет кнопки. Возьмите игроков с мастера кнопок между вопросами.</value>
+  </data>
+  <data name="QuizSetNameTooLong" xml:space="preserve">
+    <value>Мастер кнопок хранит имена до 23 байт (около 11 русских или 23 латинских букв): имя осталось только здесь.</value>
+  </data>
 </root>

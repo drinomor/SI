@@ -33,6 +33,12 @@ public interface IButtonManagerListener
     
     void OnPlayerAdded(string? id, string playerName) { }
 
+    /// <summary>
+    /// Adds a player for a button (through the game engine: it may appear later, see
+    /// <see cref="IButtonManager.OnPlayersChanged" />).
+    /// </summary>
+    void AddPlayerForButton() { }
+
     bool TryConnectPlayer(string playerName, string connectionId) => false;
 
     bool TryDisconnectPlayer(string playerName) => false;

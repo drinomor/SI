@@ -74,6 +74,11 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
 
     public ICommand NavigateToSite { get; private set; }
 
+    /// <summary>
+    /// QuizSet buttons: as many players as buttons connected to the master now (names come at the game start).
+    /// </summary>
+    public ICommand TakePlayersFromButtons { get; private set; }
+
     public ICommand SelectColor { get; private set; }
 
     private ICommand _activePlayerButtonCommand;
@@ -231,6 +236,7 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         _removePlayerButton = new SimpleCommand(RemovePlayerButton_Executed);
 
         NavigateToSite = new SimpleCommand(NavigateToSite_Executed);
+        TakePlayersFromButtons = new SimpleCommand(TakePlayersFromButtons_Executed);
         SelectColor = new SimpleCommand(SelectColor_Executed);
 
         OpenLicensesFolder = new SimpleCommand(OpenLicensesFolder_Executed);
@@ -889,6 +895,16 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         soundViewModel.Value = fileUri;
+    }
+
+    private async void TakePlayersFromButtons_Executed(object? arg)
+    {
+        var count = await PlatformManager.Instance.CountConnectedButtonsAsync(Settings.ComPort);
+
+        if (count.HasValue)
+        {
+            Settings.PlayerCount = count.Value;
+        }
     }
 
     private async void AddPlayerButton_Executed(object? arg)

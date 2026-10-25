@@ -181,6 +181,16 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="ButtonPlayersColumn" TargetType="ColumnDefinition">
+            <Setter Property="Width" Value="29" />
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.HasButtonPlayers, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
+                    <Setter Property="Width" Value="0" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
         <DataTemplate x:Key="PlayersTable">
             <DockPanel Margin="1,3,1,1">
                 <DockPanel.Resources>
@@ -218,6 +228,29 @@
                             Stretch="Fill"
                             Stroke="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}"
                             StrokeThickness="4" />
+                    </Button>
+
+                    <Button
+                        Height="23"
+                        Width="23"
+                        Padding="3"
+                        Margin="1"
+                        Command="{Binding SyncButtonPlayers}"
+                        ToolTip="{x:Static lp:Resources.TakePlayersFromButtons}">
+                        <Path
+                            Data="M20,0L30,0L30,30L40,30L25,48L10,30L20,30z M0,50L50,50L50,56L0,56z"
+                            Stretch="Uniform"
+                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource ToolButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasButtonPlayers}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                     </Button>
 
                     <Button
@@ -299,6 +332,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
+                                        <ColumnDefinition Style="{StaticResource ButtonPlayersColumn}" />
                                         <ColumnDefinition Width="29" />
                                     </Grid.ColumnDefinitions>
 
@@ -440,6 +474,22 @@
 
                                     <Button
                                         Grid.Column="8"
+                                        Style="{StaticResource ToolButton}"
+                                        Padding="4"
+                                        Margin="1"
+                                        ToolTip="{x:Static lp:Resources.IdentifyButton}"
+                                        VerticalContentAlignment="Center"
+                                        Height="23"
+                                        Width="23"
+                                        Command="{Binding
+                                            RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
+                                            Path=DataContext.IdentifyButton}"
+                                        CommandParameter="{Binding}">
+                                        <Ellipse Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                    </Button>
+
+                                    <Button
+                                        Grid.Column="9"
                                         Style="{StaticResource ToolButton}"
                                         Padding="3"
                                         Margin="1"

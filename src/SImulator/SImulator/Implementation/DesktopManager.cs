@@ -162,6 +162,9 @@ internal sealed class DesktopManager : PlatformManager, IPlatformService
 
     public override string[] GetComPorts() => SerialPort.GetPortNames();
 
+    public override Task<int?> CountConnectedButtonsAsync(string portName) =>
+        ButtonManagers.QuizSetButtonManager.CountConnectedButtonsAsync(portName);
+
     public override bool IsEscapeKey(GameKey key) => (Key)key == Key.Escape;
 
     public override int GetKeyNumber(GameKey key)
