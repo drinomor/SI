@@ -39,12 +39,14 @@ public sealed record ButtonsVerdict(PlayerInfo Player, bool IsRight, int Number)
 /// <param name="Answering">The answering player in <see cref="ButtonsPhase.Locked" />.</param>
 /// <param name="Out">Players that may not press any more in this question.</param>
 /// <param name="Verdict">The latest verdict in this question, if any.</param>
+/// <param name="IsPaused">The game is paused (no pressing: the phase is not open).</param>
 public sealed record ButtonsGameState(
     int Question,
     ButtonsPhase Phase,
     PlayerInfo? Answering,
     IReadOnlyList<PlayerInfo> Out,
-    ButtonsVerdict? Verdict);
+    ButtonsVerdict? Verdict,
+    bool IsPaused = false);
 
 /// <summary>
 /// Button managers whose buttons show the game themselves (QuizSet): the game tells them its state on every change.

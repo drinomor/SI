@@ -143,6 +143,17 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
         Settings.UsePlayersKeys == PlayerKeysModes.QuizSet ? PlatformManager.Instance.GetQuizSetPorts() : _comPorts.Value;
 
     /// <summary>
+    /// The list is opened: a master plugged in meanwhile appears.
+    /// </summary>
+    public void RefreshComPorts()
+    {
+        if (Settings.UsePlayersKeys == PlayerKeysModes.QuizSet)
+        {
+            UpdateComPorts();
+        }
+    }
+
+    /// <summary>
     /// The chosen port must be one of <see cref="ComPorts" />: the first one otherwise.
     /// </summary>
     private void UpdateComPorts()
@@ -184,6 +195,27 @@ public sealed class MainViewModel : INotifyPropertyChanged, IButtonManagerListen
                 _mode = value;
                 OnPropertyChanged();
                 OnModeChanged();
+
+                // The game needs the width; the settings are reached by the menu button
+                IsNavigationCollapsed = value == GameMode.Moderator;
+            }
+        }
+    }
+
+    private bool _isNavigationCollapsed;
+
+    /// <summary>
+    /// The left menu shows icons only.
+    /// </summary>
+    public bool IsNavigationCollapsed
+    {
+        get => _isNavigationCollapsed;
+        set
+        {
+            if (_isNavigationCollapsed != value)
+            {
+                _isNavigationCollapsed = value;
+                OnPropertyChanged();
             }
         }
     }

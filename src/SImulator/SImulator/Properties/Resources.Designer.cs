@@ -367,6 +367,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Button.
+        /// </summary>
+        public static string ButtonColumn {
+            get {
+                return ResourceManager.GetString("ButtonColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Matches positions of players in the list.
         /// </summary>
         public static string ButtonOrderHint {
@@ -547,6 +556,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Continue the game.
+        /// </summary>
+        public static string ContinueGame {
+            get {
+                return ResourceManager.GetString("ContinueGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (by default).
         /// </summary>
         public static string Default {
@@ -661,6 +679,15 @@ namespace SImulator.Properties {
         public static string ErrorSendConfirm {
             get {
                 return ResourceManager.GetString("ErrorSendConfirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu.
+        /// </summary>
+        public static string ExpandMenu {
+            get {
+                return ResourceManager.GetString("ExpandMenu", resourceCulture);
             }
         }
         
@@ -1024,6 +1051,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to no button.
+        /// </summary>
+        public static string NoButton {
+            get {
+                return ResourceManager.GetString("NoButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Not selected.
         /// </summary>
         public static string NotSelected {
@@ -1146,6 +1182,15 @@ namespace SImulator.Properties {
         public static string Pause {
             get {
                 return ResourceManager.GetString("Pause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause the game.
+        /// </summary>
+        public static string PauseGame {
+            get {
+                return ResourceManager.GetString("PauseGame", resourceCulture);
             }
         }
         
@@ -1443,6 +1488,105 @@ namespace SImulator.Properties {
         public static string QuizSetProtocolMismatch {
             get {
                 return ResourceManager.GetString("QuizSetProtocolMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buttons: {0} is answering.
+        /// </summary>
+        public static string QuizSetStatusAnswering {
+            get {
+                return ResourceManager.GetString("QuizSetStatusAnswering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buttons: {0} linked · {1} offline.
+        /// </summary>
+        public static string QuizSetStatusButtons {
+            get {
+                return ResourceManager.GetString("QuizSetStatusButtons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buttons are dark.
+        /// </summary>
+        public static string QuizSetStatusDark {
+            get {
+                return ResourceManager.GetString("QuizSetStatusDark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QuizSet · {0} · linked.
+        /// </summary>
+        public static string QuizSetStatusLinked {
+            get {
+                return ResourceManager.GetString("QuizSetStatusLinked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New button {0}.
+        /// </summary>
+        public static string QuizSetStatusNewButton {
+            get {
+                return ResourceManager.GetString("QuizSetStatusNewButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New button {0} «{1}».
+        /// </summary>
+        public static string QuizSetStatusNewButtonNamed {
+            get {
+                return ResourceManager.GetString("QuizSetStatusNewButtonNamed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New buttons: {0}.
+        /// </summary>
+        public static string QuizSetStatusNewButtons {
+            get {
+                return ResourceManager.GetString("QuizSetStatusNewButtons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QuizSet · {0} · the master does not answer.
+        /// </summary>
+        public static string QuizSetStatusNoAnswer {
+            get {
+                return ResourceManager.GetString("QuizSetStatusNoAnswer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QuizSet · {0} · the master is not in QuizSet mode.
+        /// </summary>
+        public static string QuizSetStatusNotActive {
+            get {
+                return ResourceManager.GetString("QuizSetStatusNotActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Buttons: answers open.
+        /// </summary>
+        public static string QuizSetStatusOpen {
+            get {
+                return ResourceManager.GetString("QuizSetStatusOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause · buttons are dark.
+        /// </summary>
+        public static string QuizSetStatusPaused {
+            get {
+                return ResourceManager.GetString("QuizSetStatusPaused", resourceCulture);
             }
         }
         
@@ -1816,6 +1960,15 @@ namespace SImulator.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Drag to resize.
+        /// </summary>
+        public static string SplitterHint {
+            get {
+                return ResourceManager.GetString("SplitterHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stake.
         /// </summary>
         public static string Stake {
@@ -1914,6 +2067,15 @@ namespace SImulator.Properties {
         public static string TableHotKeysHint {
             get {
                 return ResourceManager.GetString("TableHotKeysHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Take into the game.
+        /// </summary>
+        public static string TakeIntoGame {
+            get {
+                return ResourceManager.GetString("TakeIntoGame", resourceCulture);
             }
         }
         

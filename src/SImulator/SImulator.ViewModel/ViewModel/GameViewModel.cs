@@ -173,6 +173,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     /// </summary>
     public bool HasButtonPlayers => _buttonManager is IButtonPlayersSource;
 
+    /// <summary>
+    /// The status line of the buttons that know their players (QuizSet); null for other buttons.
+    /// </summary>
+    public ButtonsStatus? ButtonsStatus => (_buttonManager as IButtonPlayersSource)?.Status;
+
     public SimpleCommand ResetSums { get; private set; }
 
     public ICommand GiveTurn { get; private set; }
@@ -658,6 +663,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
     private void OnIsPausedChanged()
     {
         PresentationController.SetPause(IsPaused, QuestionTime * 10);
+        PublishButtonsState(); // paused: presses are ignored (ProcessPlayerPress), so the buttons go dark
 
         if (IsPaused && ActiveQuestionCommand == StopQuestionTimer)
         {
@@ -1493,6 +1499,7 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
         }
 
         OnPropertyChanged(nameof(HasButtonPlayers));
+        OnPropertyChanged(nameof(ButtonsStatus));
 
         await PresentationController.StartAsync(InitPresentation);
 
@@ -2393,10 +2400,11 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             return;
         }
 
-        // Pressing is open only while the buttons listen; a player selected in Pressed / Thinking is answering
+        // Pressing is open only while the buttons listen and the game is not paused; a player selected in
+        // Pressed / Thinking is answering (and may still be judged during a pause)
         var phase = _selectedPlayer != null && (_state == QuestionState.Pressed || _state == QuestionState.Thinking)
             ? ButtonsPhase.Locked
-            : _buttonsStarted && _state == QuestionState.Pressing ? ButtonsPhase.Open : ButtonsPhase.Idle;
+            : _buttonsStarted && _state == QuestionState.Pressing && !IsPaused ? ButtonsPhase.Open : ButtonsPhase.Idle;
 
         // Players who have already answered this question may not press again (see ProcessPlayerPress)
         var answered = _selectedPlayers.Where(player => player != _selectedPlayer).ToList();
@@ -2406,7 +2414,8 @@ public sealed class GameViewModel : INotifyPropertyChanged, IButtonManagerListen
             phase,
             phase == ButtonsPhase.Locked ? _selectedPlayer : null,
             answered,
-            _buttonsVerdict));
+            _buttonsVerdict,
+            IsPaused));
     }
 
     /// <summary>

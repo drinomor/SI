@@ -55,6 +55,28 @@ public sealed class PlayerInfo : INotifyPropertyChanged
         set { _wrong = value; OnPropertyChanged(); }
     }
 
+    private int _buttonNumber;
+
+    /// <summary>
+    /// The player's button of the QuizSet master; 0 = none.
+    /// </summary>
+    public int ButtonNumber
+    {
+        get => _buttonNumber;
+        set { if (_buttonNumber != value) { _buttonNumber = value; OnPropertyChanged(); } }
+    }
+
+    private bool _isButtonConnected;
+
+    /// <summary>
+    /// The player's button is linked with the master now.
+    /// </summary>
+    public bool IsButtonConnected
+    {
+        get => _isButtonConnected;
+        set { if (_isButtonConnected != value) { _isButtonConnected = value; OnPropertyChanged(); } }
+    }
+
     private bool _isSelected;
 
     public bool IsSelected

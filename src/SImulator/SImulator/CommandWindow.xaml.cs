@@ -35,6 +35,9 @@ public partial class CommandWindow : Window
         }
     }
 
+    // QuizSet: a master plugged in after the mode was chosen appears in the list
+    private void ComPorts_DropDownOpened(object sender, EventArgs e) => (DataContext as MainViewModel)?.RefreshComPorts();
+
     private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
     {
         e.Accepted = (ViewModel.Core.PlayerKeysModes)e.Item != ViewModel.Core.PlayerKeysModes.Com;

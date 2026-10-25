@@ -8,6 +8,11 @@ namespace SImulator.ViewModel.ButtonManagers;
 public interface IButtonPlayersSource
 {
     /// <summary>
+    /// The link and the buttons, for the host's status line.
+    /// </summary>
+    ButtonsStatus Status { get; }
+
+    /// <summary>
     /// Binds every connected button that has no player yet: to an unbound player (one with the button's name first),
     /// or to a new player. Only adds: players without a button stay. The host calls it between questions.
     /// </summary>

@@ -13,6 +13,8 @@
     Exit="Application_Exit"
     ShutdownMode="OnMainWindowClose">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+
         <lc:AtomTypeConverter x:Key="AtomTypeConverter" />
         <lc:EqualMultiConverter x:Key="EqualMultiConverter" />
 
@@ -181,18 +183,10 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="ButtonPlayersColumn" TargetType="ColumnDefinition">
-            <Setter Property="Width" Value="29" />
-
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding DataContext.HasButtonPlayers, RelativeSource={RelativeSource AncestorType=DockPanel}}" Value="False">
-                    <Setter Property="Width" Value="0" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
         <DataTemplate x:Key="PlayersTable">
-            <DockPanel Margin="1,3,1,1">
+            <!-- The header and the rows are separate grids: SharedSizeGroup keeps the "Auto" columns of the QuizSet
+                 buttons equally wide in all of them (0 when no buttons know their players) -->
+            <DockPanel Margin="1,3,1,1" Grid.IsSharedSizeScope="True">
                 <DockPanel.Resources>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Margin" Value="5" />
@@ -232,21 +226,38 @@
 
                     <Button
                         Height="23"
-                        Width="23"
-                        Padding="3"
-                        Margin="1"
+                        Padding="6,2"
+                        Margin="6,1,1,1"
                         Command="{Binding SyncButtonPlayers}"
                         ToolTip="{x:Static lp:Resources.TakePlayersFromButtons}">
-                        <Path
-                            Data="M20,0L30,0L30,30L40,30L25,48L10,30L20,30z M0,50L50,50L50,56L0,56z"
-                            Stretch="Uniform"
-                            Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Path
+                                Width="12"
+                                Height="14"
+                                Data="M20,0L30,0L30,30L40,30L25,48L10,30L20,30z M0,50L50,50L50,56L0,56z"
+                                Stretch="Uniform"
+                                Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+
+                            <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Text="{x:Static lp:Resources.TakePlayersFromButtons}" />
+
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                Visibility="{Binding ButtonsStatus.HasNew, Converter={StaticResource BooleanToVisibility}}">
+                                <Run Text=" (+" /><Run Text="{Binding ButtonsStatus.NewCount, Mode=OneWay}" /><Run Text=")" />
+                            </TextBlock>
+                        </StackPanel>
 
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource ToolButton}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding HasButtonPlayers}" Value="False">
                                         <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ButtonsStatus.HasNew}" Value="True">
+                                        <Setter Property="Background" Value="#FFFFF8E1" />
+                                        <Setter Property="BorderBrush" Value="#FFF0B400" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -275,6 +286,7 @@
                 <Grid DockPanel.Dock="Top" Margin="0,0,17,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="29" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="QuizSetButton" />
                         <ColumnDefinition Width="3*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="100" />
@@ -282,6 +294,7 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                         <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
+                        <ColumnDefinition Width="Auto" SharedSizeGroup="QuizSetIdentify" />
                         <ColumnDefinition Width="29" />
                     </Grid.ColumnDefinitions>
 
@@ -291,14 +304,19 @@
                         </Style>
                     </Grid.Resources>
 
-                    <TextBlock Grid.Column="1" Text="{x:Static lp:Resources.Name}" />
-                    <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Sum}" />
-                    <TextBlock Grid.Column="4" Text="{x:Static lp:Resources.RightAnswers}" />
-                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.WrongAnswers}" />
-                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.Answer}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4,0"
+                        Text="{x:Static lp:Resources.ButtonColumn}"
+                        Visibility="{Binding HasButtonPlayers, Converter={StaticResource BooleanToVisibility}}" />
+                    <TextBlock Grid.Column="2" Text="{x:Static lp:Resources.Name}" />
+                    <TextBlock Grid.Column="3" Text="{x:Static lp:Resources.Sum}" />
+                    <TextBlock Grid.Column="5" Text="{x:Static lp:Resources.RightAnswers}" />
+                    <TextBlock Grid.Column="6" Text="{x:Static lp:Resources.WrongAnswers}" />
+                    <TextBlock Grid.Column="7" Text="{x:Static lp:Resources.Answer}" />
 
                     <TextBox
-                        Grid.Column="3"
+                        Grid.Column="4"
                         Margin="26,0,26,0"
                         lb:NumericBehavior.IsAttached="True"
                         Text="{Binding Price}"
@@ -325,6 +343,7 @@
                                 <Grid x:Name="line">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="29" />
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="QuizSetButton" />
                                         <ColumnDefinition Width="3*" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="100" />
@@ -332,7 +351,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn}" />
                                         <ColumnDefinition Style="{StaticResource ManagedColumn2}" />
-                                        <ColumnDefinition Style="{StaticResource ButtonPlayersColumn}" />
+                                        <ColumnDefinition Width="Auto" SharedSizeGroup="QuizSetIdentify" />
                                         <ColumnDefinition Width="29" />
                                     </Grid.ColumnDefinitions>
 
@@ -348,9 +367,31 @@
                                         <Image Source="/Images/active_player.png" />
                                     </Button>
 
+                                    <Border
+                                        x:Name="buttonBadge"
+                                        Grid.Column="1"
+                                        Margin="1"
+                                        Padding="6,0"
+                                        Height="23"
+                                        Background="White"
+                                        BorderBrush="#FFBBBBBB"
+                                        BorderThickness="1"
+                                        CornerRadius="3"
+                                        Visibility="Collapsed">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Ellipse x:Name="buttonDot" Width="9" Height="9" Margin="0,0,5,0" Fill="#FFBBBBBB" />
+
+                                            <TextBlock x:Name="buttonNumber">
+                                                <Run Text="№" /> <Run Text="{Binding ButtonNumber, Mode=OneWay}" />
+                                            </TextBlock>
+
+                                            <TextBlock x:Name="noButton" Foreground="Gray" Text="{x:Static lp:Resources.NoButton}" Visibility="Collapsed" />
+                                        </StackPanel>
+                                    </Border>
+
                                     <TextBox
                                         x:Name="name"
-                                        Grid.Column="1"
+                                        Grid.Column="2"
                                         FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"
                                         Margin="1"
                                         Width="Auto"
@@ -364,10 +405,10 @@
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="2"
+                                        Grid.Column="3"
                                         Text="{Binding Sum}" />
 
-                                    <DockPanel Grid.Column="3">
+                                    <DockPanel Grid.Column="4">
                                         <Button
                                             Style="{StaticResource ToolButton}"
                                             DockPanel.Dock="Right"
@@ -416,18 +457,18 @@
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="4"
+                                        Grid.Column="5"
                                         Text="{Binding Right}" />
                                     
                                     <TextBox
                                         lb:NumericBehavior.IsAttached="True"
                                         Margin="1"
-                                        Grid.Column="5"
+                                        Grid.Column="6"
                                         Text="{Binding Wrong}" />
 
                                     <TextBox
                                         Margin="1"
-                                        Grid.Column="6"
+                                        Grid.Column="7"
                                         IsReadOnly="True"
                                         Text="{Binding Answer}"
                                         VerticalContentAlignment="Center">
@@ -443,7 +484,7 @@
                                     </TextBox>
 
                                     <Button
-                                        Grid.Column="7"
+                                        Grid.Column="8"
                                         Padding="3"
                                         Margin="1"
                                         ToolTip="{x:Static lp:Resources.KickPlayer}"
@@ -473,7 +514,9 @@
                                     </Button>
 
                                     <Button
-                                        Grid.Column="8"
+                                        x:Name="identify"
+                                        Grid.Column="9"
+                                        Visibility="Collapsed"
                                         Style="{StaticResource ToolButton}"
                                         Padding="4"
                                         Margin="1"
@@ -485,11 +528,11 @@
                                             RelativeSource={RelativeSource FindAncestor, AncestorType=ItemsControl, AncestorLevel=1},
                                             Path=DataContext.IdentifyButton}"
                                         CommandParameter="{Binding}">
-                                        <Ellipse Fill="{Binding RelativeSource={RelativeSource AncestorType=Button},Path=Foreground}" />
+                                        <Ellipse Width="12" Height="12" Fill="#FFF0B400" Stroke="#FF8A6D00" StrokeThickness="1" />
                                     </Button>
 
                                     <Button
-                                        Grid.Column="9"
+                                        Grid.Column="10"
                                         Style="{StaticResource ToolButton}"
                                         Padding="3"
                                         Margin="1"
@@ -510,6 +553,23 @@
                                 </Grid>
 
                                 <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding DataContext.HasButtonPlayers, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Value="True">
+                                        <Setter TargetName="buttonBadge" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="identify" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding IsButtonConnected}" Value="True">
+                                        <Setter TargetName="buttonDot" Property="Fill" Value="#FF2E7D32" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ButtonNumber}" Value="0">
+                                        <Setter TargetName="buttonDot" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="buttonNumber" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="noButton" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="identify" Property="IsEnabled" Value="False" />
+                                        <Setter TargetName="identify" Property="Opacity" Value="0" />
+                                    </DataTrigger>
+
                                     <DataTrigger Value="True">
                                         <DataTrigger.Binding>
                                             <MultiBinding Converter="{StaticResource EqualMultiConverter}">
@@ -625,6 +685,17 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
                         <Border x:Name="border" Background="Transparent" MinWidth="150">
+                            <Grid>
+                            <TextBlock
+                                x:Name="icon"
+                                Text="{TemplateBinding Tag}"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="18"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="0,12"
+                                Visibility="Collapsed" />
+
                             <ContentPresenter
                                 x:Name="header"
                                 ContentSource="Header"
@@ -638,6 +709,7 @@
                                     <ScaleTransform x:Name="tr" ScaleX="1.0" ScaleY="{Binding RelativeSource={RelativeSource Self}, Path=ScaleX}" />
                                 </ContentPresenter.RenderTransform>
                             </ContentPresenter>
+                            </Grid>
                         </Border>
                         
                         <ControlTemplate.Triggers>
@@ -648,7 +720,16 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="border" Property="Background" Value="Black" />
                                 <Setter TargetName="header" Property="TextBlock.Foreground" Value="White" />
+                                <Setter TargetName="icon" Property="Foreground" Value="White" />
                             </Trigger>
+
+                            <!-- MainViewModel.IsNavigationCollapsed: icons only, the name in the tooltip -->
+                            <DataTrigger Binding="{Binding IsNavigationCollapsed}" Value="True">
+                                <Setter TargetName="border" Property="MinWidth" Value="44" />
+                                <Setter TargetName="header" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="icon" Property="Visibility" Value="Visible" />
+                                <Setter Property="ToolTip" Value="{Binding Header, RelativeSource={RelativeSource Self}}" />
+                            </DataTrigger>
                             
                             <EventTrigger SourceName="border" RoutedEvent="MouseLeftButtonDown">
                                 <EventTrigger.Actions>

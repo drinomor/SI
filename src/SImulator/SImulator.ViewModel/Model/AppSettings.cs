@@ -143,6 +143,54 @@ public sealed class AppSettings : INotifyPropertyChanged
         }
     }
 
+    private string _gameAreaHeight = "3*";
+
+    /// <summary>
+    /// Host window: the height of the game section (a GridLength: "3*", "300"); changed by its splitter.
+    /// </summary>
+    [DefaultValue("3*")]
+    public string GameAreaHeight
+    {
+        get => _gameAreaHeight;
+        set { if (_gameAreaHeight != value) { _gameAreaHeight = value; OnPropertyChanged(); } }
+    }
+
+    private string _playersAreaHeight = "2*";
+
+    /// <summary>
+    /// Host window: the height of the players section, see <see cref="GameAreaHeight" />.
+    /// </summary>
+    [DefaultValue("2*")]
+    public string PlayersAreaHeight
+    {
+        get => _playersAreaHeight;
+        set { if (_playersAreaHeight != value) { _playersAreaHeight = value; OnPropertyChanged(); } }
+    }
+
+    private string _questionAreaWidth = "*";
+
+    /// <summary>
+    /// Host window: the width of the question in the game section, see <see cref="GameAreaHeight" />.
+    /// </summary>
+    [DefaultValue("*")]
+    public string QuestionAreaWidth
+    {
+        get => _questionAreaWidth;
+        set { if (_questionAreaWidth != value) { _questionAreaWidth = value; OnPropertyChanged(); } }
+    }
+
+    private string _timersAreaWidth = "260";
+
+    /// <summary>
+    /// Host window: the width of the pause and timers column, see <see cref="GameAreaHeight" />.
+    /// </summary>
+    [DefaultValue("260")]
+    public string TimersAreaWidth
+    {
+        get => _timersAreaWidth;
+        set { if (_timersAreaWidth != value) { _timersAreaWidth = value; OnPropertyChanged(); } }
+    }
+
     private int _screenNumber = 0;
 
     [DefaultValue(0)]

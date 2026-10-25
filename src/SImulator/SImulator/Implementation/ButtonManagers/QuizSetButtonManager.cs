@@ -31,6 +31,12 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     private static readonly TimeSpan QueryTimeout = TimeSpan.FromSeconds(2);
 
     /// <summary>
+    /// The master answers only to commands: a HELLO every few repetitions tells whether it is still there.
+    /// </summary>
+    private const int HelloEveryRepeats = 3;
+    private static readonly TimeSpan LinkTimeout = TimeSpan.FromSeconds(6);
+
+    /// <summary>
     /// Player identifier prefix of a player bound to a button: "quizset:3" is button 3.
     /// </summary>
     internal const string PlayerIdPrefix = "quizset:";
@@ -43,6 +49,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
 
     private readonly SerialPort _port;
     private readonly Timer _repeatTimer;
+    private int _repeats; /* repeat timer only */
 
     /// <summary>
     /// Guards writing to the port (UI thread and the repeat timer) and <see cref="_stateLine" />.
@@ -100,6 +107,18 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     /// </summary>
     private readonly HashSet<PlayerInfo> _watched = new();
 
+    /// <summary>
+    /// When a line came from the master last (UTC); MinValue = never.
+    /// </summary>
+    private DateTime _lastHeard = DateTime.MinValue;
+
+    /// <summary>
+    /// The master said it is in QuizSet mode (HELLO ... active=1).
+    /// </summary>
+    private bool _masterActive;
+
+    public ButtonsStatus Status { get; } = new();
+
     private QuizSetButtonManager(SerialPort port, IButtonManagerListener buttonManagerListener) : base(buttonManagerListener)
     {
         _port = port;
@@ -121,6 +140,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         }
 
         var manager = new QuizSetButtonManager(port, buttonManagerListener);
+        manager.UpdateStatus();
         manager.Send($"HELLO quizset {ProtocolVersion}");
         manager.Repeat(); // dark buttons at once: in the master's free phase every press would be a false start here
         manager.SyncPlayers();
@@ -198,6 +218,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     public void OnGameStateChanged(ButtonsGameState state)
     {
         _lastState = state;
+        UpdateStatus();
         var line = BuildStateLine(state);
 
         lock (_sendLock)
@@ -228,6 +249,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         }
 
         BindAcceptedButtons();
+        UpdateStatus();
     }
 
     public void SyncPlayers()
@@ -436,6 +458,9 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         BindAcceptedButtons();
     }
 
+    /// <summary>
+    /// Repeat timer (a pool thread): the state again, a HELLO now and then, and the status line on the UI thread.
+    /// </summary>
     private void Repeat()
     {
         string line;
@@ -446,6 +471,57 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
         }
 
         Send(line);
+
+        if (++_repeats % HelloEveryRepeats == 0)
+        {
+            Send($"HELLO quizset {ProtocolVersion}");
+            UI.Execute(UpdateStatus, exc => Trace.TraceError(exc.Message));
+        }
+    }
+
+    /// <summary>
+    /// The status line and the players' buttons. UI thread.
+    /// </summary>
+    private void UpdateStatus()
+    {
+        var heard = DateTime.UtcNow - _lastHeard < LinkTimeout;
+        Status.IsLinked = heard && _masterActive;
+        Status.LinkText = string.Format(
+            !heard ? Resources.QuizSetStatusNoAnswer : _masterActive ? Resources.QuizSetStatusLinked : Resources.QuizSetStatusNotActive,
+            _port.PortName);
+
+        var on = _buttons.Count(button => button.Value.IsOn);
+        Status.ButtonsText = string.Format(Resources.QuizSetStatusButtons, on, _buttons.Count - on);
+
+        // Connected, without a player and not taken yet: the host decides
+        var fresh = _buttons
+            .Where(pair => pair.Value.IsOn && !_accepted.Contains(pair.Key) && FindPlayer(pair.Key) == null)
+            .OrderBy(pair => pair.Key)
+            .ToList();
+
+        Status.NewCount = fresh.Count;
+        Status.NewButtonsText = fresh.Count switch
+        {
+            0 => "",
+            1 when fresh[0].Value.Name.Length > 0 => string.Format(Resources.QuizSetStatusNewButtonNamed, fresh[0].Key, fresh[0].Value.Name),
+            1 => string.Format(Resources.QuizSetStatusNewButton, fresh[0].Key),
+            _ => string.Format(Resources.QuizSetStatusNewButtons, string.Join(", ", fresh.Select(pair => pair.Key))),
+        };
+
+        Status.StateText = _lastState switch
+        {
+            { IsPaused: true } => Resources.QuizSetStatusPaused,
+            { Phase: ButtonsPhase.Open } => Resources.QuizSetStatusOpen,
+            { Phase: ButtonsPhase.Locked, Answering: PlayerInfo answering } => string.Format(Resources.QuizSetStatusAnswering, answering.Name),
+            _ => Resources.QuizSetStatusDark,
+        };
+
+        foreach (var player in Listener.GamePlayers)
+        {
+            var id = DeviceId(player);
+            player.ButtonNumber = id ?? 0;
+            player.IsButtonConnected = id.HasValue && _buttons.TryGetValue(id.Value, out var button) && button.IsOn;
+        }
     }
 
     private void Send(string line)
@@ -505,6 +581,13 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
     /// </summary>
     private void HandleLine(string line)
     {
+        _lastHeard = DateTime.UtcNow;
+        HandleLineCore(line);
+        UpdateStatus();
+    }
+
+    private void HandleLineCore(string line)
+    {
         if (TryParsePlayer(line, out var buttonId, out var button))
         {
             OnButtonChanged(buttonId, button);
@@ -545,6 +628,8 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
 
             case "HELLO":
                 // HELLO quizset <version> <firmware> active=<0|1>
+                _masterActive = parts.Contains("active=1");
+
                 if (parts.Length < 3 || parts[2] != ProtocolVersion.ToString())
                 {
                     ReportOnce(string.Format(Resources.QuizSetProtocolMismatch, line, ProtocolVersion));
@@ -557,6 +642,7 @@ internal sealed class QuizSetButtonManager : ButtonManagerBase, IGameStateButton
                 break;
 
             case "ERR" when line.StartsWith("ERR S master not in QuizSet mode"):
+                _masterActive = false;
                 ReportOnce(Resources.QuizSetNotActive);
                 break;
 

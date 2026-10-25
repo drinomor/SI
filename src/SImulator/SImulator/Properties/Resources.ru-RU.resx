@@ -808,4 +808,58 @@ Escape (правая кнопка мыши) - завершить игру</value
   <data name="QuizSetNameTooLong" xml:space="preserve">
     <value>Мастер кнопок хранит имена до 23 байт (около 11 русских или 23 латинских букв): имя осталось только здесь.</value>
   </data>
+  <data name="QuizSetStatusLinked" xml:space="preserve">
+    <value>QuizSet · {0} · связь есть</value>
+  </data>
+  <data name="QuizSetStatusNoAnswer" xml:space="preserve">
+    <value>QuizSet · {0} · мастер не отвечает</value>
+  </data>
+  <data name="QuizSetStatusNotActive" xml:space="preserve">
+    <value>QuizSet · {0} · мастер не в режиме QuizSet</value>
+  </data>
+  <data name="QuizSetStatusButtons" xml:space="preserve">
+    <value>Кнопки: {0} на связи · {1} без связи</value>
+  </data>
+  <data name="QuizSetStatusNewButton" xml:space="preserve">
+    <value>Новая кнопка {0}</value>
+  </data>
+  <data name="QuizSetStatusNewButtonNamed" xml:space="preserve">
+    <value>Новая кнопка {0} «{1}»</value>
+  </data>
+  <data name="QuizSetStatusNewButtons" xml:space="preserve">
+    <value>Новые кнопки: {0}</value>
+  </data>
+  <data name="QuizSetStatusOpen" xml:space="preserve">
+    <value>Кнопки: прием ответов</value>
+  </data>
+  <data name="QuizSetStatusAnswering" xml:space="preserve">
+    <value>Кнопки: отвечает {0}</value>
+  </data>
+  <data name="QuizSetStatusDark" xml:space="preserve">
+    <value>Кнопки погашены</value>
+  </data>
+  <data name="QuizSetStatusPaused" xml:space="preserve">
+    <value>Пауза · кнопки погашены</value>
+  </data>
+  <data name="TakeIntoGame" xml:space="preserve">
+    <value>Взять в игру</value>
+  </data>
+  <data name="PauseGame" xml:space="preserve">
+    <value>Пауза игры</value>
+  </data>
+  <data name="ContinueGame" xml:space="preserve">
+    <value>Продолжить игру</value>
+  </data>
+  <data name="ExpandMenu" xml:space="preserve">
+    <value>Меню</value>
+  </data>
+  <data name="SplitterHint" xml:space="preserve">
+    <value>Потяните, чтобы изменить размер</value>
+  </data>
+  <data name="ButtonColumn" xml:space="preserve">
+    <value>Кнопка</value>
+  </data>
+  <data name="NoButton" xml:space="preserve">
+    <value>без кнопки</value>
+  </data>
 </root>
